@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Instalações</title>
+    <title>Controle de Instala莽玫es</title>
     <meta name="theme-color" content="#183729">
     <meta name="mobile-web-app-capable" content="yes">
     
@@ -385,6 +385,70 @@
             color: var(--text-muted);
             background-color: var(--input-bg);
         }
+
+        /* Card de Comiss茫o */
+        .commission-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .commission-card h4 {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .commission-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .commission-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .commission-badge {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .progress-bar-bg {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            height: 8px;
+            width: 100%;
+            overflow: hidden;
+            margin: 6px 0 4px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Indicador visual ao segurar para apagar */
+        tr.row-pressing {
+            background-color: rgba(248, 113, 113, 0.3) !important;
+            transition: background-color 0.8s ease;
+        }
     </style>
 </head>
 <body>
@@ -396,35 +460,35 @@
             <span></span>
             <span></span>
         </button>
-        <h1>Controle de Instalações</h1>
+        <h1>Controle de Instala莽玫es</h1>
     </header>
 
     <!-- Overlay e Menu Lateral -->
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
     <div class="menu-drawer" id="menuDrawer">
         <div class="menu-header">
-            <h2>Informações</h2>
+            <h2>Informa莽玫es</h2>
             <button class="btn-close-menu" onclick="toggleMenu()">&times;</button>
         </div>
         <div class="menu-content">
             <div class="menu-info-card">
-                <h4>📊 Resumo de Pendências</h4>
+                <h4>馃搳 Resumo de Pend锚ncias</h4>
                 <div class="status-summary-item">
-                    <span>Instalações Feitas:</span>
+                    <span>Instala莽玫es Feitas:</span>
                     <strong id="qtdInstalados" style="color: var(--success);">0</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Instalações Pendentes:</span>
+                    <span>Instala莽玫es Pendentes:</span>
                     <strong id="qtdPendentes" style="color: var(--warning);">0</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Instalações Não Feitas:</span>
+                    <span>Instala莽玫es N茫o Feitas:</span>
                     <strong id="qtdNaoInstalados" style="color: var(--danger);">0</strong>
                 </div>
             </div>
 
             <div class="menu-info-card">
-                <h4>💰 Valores Financeiros</h4>
+                <h4>馃挵 Valores Financeiros</h4>
                 <div class="status-summary-item">
                     <span>Valor Realizado:</span>
                     <strong id="valorInstalados" style="color: var(--success);">R$ 0,00</strong>
@@ -434,29 +498,42 @@
                     <strong id="valorPendentes" style="color: var(--warning);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Valor Não Realizado:</span>
+                    <span>Valor N茫o Realizado:</span>
                     <strong id="valorNaoInstalados" style="color: var(--danger);">R$ 0,00</strong>
                 </div>
             </div>
 
-            <!-- Gráfico de Pizza Centralizado -->
+            <div class="commission-card">
+                <h4>馃彿锔� Sua comiss茫o:</h4>
+                <div class="commission-row">
+                    <span class="commission-badge" id="comissaoFaixa">Faixa Inicial (0.0%)</span>
+                    <strong class="commission-val" id="comissaoValor">R$ 0,00</strong>
+                </div>
+                
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressoBarra"></div>
+                </div>
+                <div class="progress-text" id="progressoTexto">Faltam R$ 3.800,00 para atingir a Faixa 1 (2.0%)</div>
+            </div>
+
+            <!-- Gr谩fico de Pizza Centralizado -->
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Cadastro / Edição -->
+    <!-- Cadastro / Edi莽茫o -->
     <div class="card">
         <form id="instalacaoForm">
             <input type="hidden" id="editId">
             <div class="form-grid-2x2">
                 <div class="field">
-                    <label for="dataInstalacao">Data da Instalação</label>
+                    <label for="dataInstalacao">Data da Instala莽茫o</label>
                     <input type="date" id="dataInstalacao" required>
                 </div>
                 <div class="field">
-                    <label for="numeroPedido">Nº do Pedido</label>
+                    <label for="numeroPedido">N潞 do Pedido</label>
                     <input type="text" id="numeroPedido" placeholder="Ex: 37258326" required>
                 </div>
                 <div class="field">
@@ -468,7 +545,9 @@
                     <select id="status" required>
                         <option value="Pendente">Pendente</option>
                         <option value="Instalado">Instalado</option>
-                        <option value="Não Instalado">Não Instalado</option>
+                        <option value="N茫o Instalado">N茫o Instalado</option>
+                        <option value="Eliminado">Eliminado</option>
+                        <option value="Cancelado">Cancelado</option>
                     </select>
                 </div>
             </div>
@@ -479,14 +558,14 @@
         </form>
     </div>
 
-    <!-- Barra de Ações -->
+    <!-- Barra de A莽玫es -->
     <div class="actions-bar">
         <select id="ordemSelect" class="order-select" onchange="carregarRegistros()">
             <option value="data">Ordem: Data</option>
             <option value="pedido">Ordem: Pedido</option>
         </select>
-        <button type="button" class="btn-excel" onclick="exportarParaExcel()">📊 Exportar</button>
-        <button type="button" class="btn-import" onclick="document.getElementById('fileInput').click()">📥 Importar</button>
+        <button type="button" class="btn-excel" onclick="exportarParaExcel()">馃搳 Exportar</button>
+        <button type="button" class="btn-import" onclick="document.getElementById('fileInput').click()">馃摜 Importar</button>
         <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="importarDoExcel(event)">
     </div>
 
@@ -499,19 +578,19 @@
                     <th>Pedido</th>
                     <th>Valor</th>
                     <th>Status</th>
-                    <th>Ações</th>
+                    <th>A莽玫es</th>
                 </tr>
             </thead>
             <tbody id="tabelaRegistros"></tbody>
         </table>
     </div>
 
-    <!-- Paginação -->
+    <!-- Pagina莽茫o -->
     <div class="pagination">
-        <span id="pageInfo">Página 1 de 1</span>
+        <span id="pageInfo">P谩gina 1 de 1</span>
         <div class="pagination-btns">
             <button type="button" class="btn-secondary" id="btnPrev" onclick="mudarPagina(-1)">Anterior</button>
-            <button type="button" class="btn-secondary" id="btnNext" onclick="mudarPagina(1)">Próximo</button>
+            <button type="button" class="btn-secondary" id="btnNext" onclick="mudarPagina(1)">Pr贸ximo</button>
         </div>
     </div>
 </div>
@@ -523,6 +602,15 @@
     let paginaAtual = 1;
     const itensPorPagina = 10;
     let pizzaChart = null;
+
+    // --- Tabela de Regras de Comiss茫o ---
+    const REGRAS_COMISSAO = [
+        { meta: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
+        { meta: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
+        { meta: 11400, taxa: 0.030, nome: "Faixa 3 (3.0%)" },
+        { meta: 15200, taxa: 0.035, nome: "Faixa 4 (3.5%)" },
+        { meta: 19000, taxa: 0.040, nome: "Faixa 5 (4.0%)" }
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
         inicializarGrafico();
@@ -599,10 +687,21 @@
         document.getElementById('valor').value = reg.valor;
         document.getElementById('status').value = reg.status;
 
-        document.getElementById('btnSubmit').innerText = 'Salvar Alterações';
+        document.getElementById('btnSubmit').innerText = 'Salvar Altera莽玫es';
         document.getElementById('btnCancelEdit').style.display = 'inline-flex';
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- Fun莽茫o de Deletar Registro ---
+    function deletarRegistro(id) {
+        let registros = obterRegistros();
+        const reg = registros.find(r => r.id === id);
+        if (confirm(`Deseja apagar o registro do pedido #${reg ? reg.pedido : ''}?`)) {
+            registros = registros.filter(r => r.id !== id);
+            localStorage.setItem('registros_instalacao', JSON.stringify(registros));
+            carregarRegistros();
+        }
     }
 
     function cancelarEdicao() {
@@ -674,7 +773,10 @@
     function obterClasseStatus(status) {
         switch (status) {
             case 'Instalado': return 'status-instalado';
-            case 'Não Instalado': return 'status-nao-instalado';
+            case 'N茫o Instalado': 
+            case 'Eliminado': 
+            case 'Cancelado': 
+                return 'status-nao-instalado';
             case 'Pendente': return 'status-pendente';
             default: return '';
         }
@@ -703,7 +805,7 @@
             type: 'pie',
             plugins: [ChartDataLabels],
             data: {
-                labels: ['Feitas', 'Pendentes', 'Não Feitas'],
+                labels: ['Feitas', 'Pendentes', 'N茫o Feitas'],
                 datasets: [{
                     data: [0, 0, 0],
                     backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
@@ -732,10 +834,46 @@
         });
     }
 
+    // --- Fun莽茫o para Calcular e Exibir Comiss茫o no Card ---
+    function calcularComissao(valorRealizado) {
+        let taxaAtual = 0;
+        let faixaNome = "Faixa Inicial (0.0%)";
+        let proximaFaixa = REGRAS_COMISSAO[0];
+        let pctProgresso = 0;
+
+        for (let i = 0; i < REGRAS_COMISSAO.length; i++) {
+            if (valorRealizado >= REGRAS_COMISSAO[i].meta) {
+                taxaAtual = REGRAS_COMISSAO[i].taxa;
+                faixaNome = REGRAS_COMISSAO[i].nome;
+                proximaFaixa = REGRAS_COMISSAO[i + 1] || null;
+            }
+        }
+
+        const valorComissao = valorRealizado * taxaAtual;
+
+        document.getElementById('comissaoValor').innerText = formatarMoeda(valorComissao);
+        document.getElementById('comissaoFaixa').innerText = faixaNome;
+
+        const barraEl = document.getElementById('progressoBarra');
+        const textoEl = document.getElementById('progressoTexto');
+
+        if (proximaFaixa) {
+            const faltaMeta = proximaFaixa.meta - valorRealizado;
+            const baseAnterior = (taxaAtual > 0) ? (REGRAS_COMISSAO.find(r => r.taxa === taxaAtual)?.meta || 0) : 0;
+            pctProgresso = Math.min(100, Math.max(0, ((valorRealizado - baseAnterior) / (proximaFaixa.meta - baseAnterior)) * 100));
+
+            barraEl.style.width = pctProgresso + '%';
+            textoEl.innerText = `Faltam ${formatarMoeda(faltaMeta)} para atingir a ${proximaFaixa.nome}`;
+        } else {
+            barraEl.style.width = '100%';
+            textoEl.innerText = `馃帀 Parab茅ns! Voc锚 atingiu o n铆vel m谩ximo (Faixa 5 - 4.0%)`;
+        }
+    }
+
     function atualizarTotais(registrosExibidos) {
         const instalados = registrosExibidos.filter(r => r.status === 'Instalado');
         const pendentes = registrosExibidos.filter(r => r.status === 'Pendente');
-        const naoInstalados = registrosExibidos.filter(r => r.status === 'Não Instalado');
+        const naoInstalados = registrosExibidos.filter(r => r.status === 'N茫o Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
 
         const somaInstalados = instalados.reduce((acc, r) => acc + (r.valor || 0), 0);
         const somaPendentes = pendentes.reduce((acc, r) => acc + (r.valor || 0), 0);
@@ -753,6 +891,8 @@
             pizzaChart.data.datasets[0].data = [instalados.length, pendentes.length, naoInstalados.length];
             pizzaChart.update();
         }
+
+        calcularComissao(somaInstalados);
     }
 
     function mudarPagina(delta) {
@@ -770,7 +910,7 @@
         if (paginaAtual < 1) paginaAtual = 1;
         if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
 
-        document.getElementById('pageInfo').innerText = `Pág. ${paginaAtual}/${totalPaginas}`;
+        document.getElementById('pageInfo').innerText = `P谩g. ${paginaAtual}/${totalPaginas}`;
         document.getElementById('btnPrev').disabled = paginaAtual === 1;
         document.getElementById('btnNext').disabled = paginaAtual === totalPaginas;
 
@@ -800,13 +940,25 @@
                             onchange="atualizarStatus(${r.id}, this.value)">
                         <option value="Pendente" ${r.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                         <option value="Instalado" ${r.status === 'Instalado' ? 'selected' : ''}>Instalado</option>
-                        <option value="Não Instalado" ${r.status === 'Não Instalado' ? 'selected' : ''}>Não Instalado</option>
+                        <option value="N茫o Instalado" ${r.status === 'N茫o Instalado' ? 'selected' : ''}>N茫o Instalado</option>
+                        <option value="Eliminado" ${r.status === 'Eliminado' ? 'selected' : ''}>Eliminado</option>
+                        <option value="Cancelado" ${r.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
                     </select>
                 </td>
                 <td style="text-align: center;">
                     <button type="button" class="btn-edit" onclick="editarRegistro(${r.id})">Editar</button>
                 </td>
             `;
+
+            let timerSegurar = null;
+            const iniciarPressionamento = () => { tr.classList.add('row-pressing'); timerSegurar = setTimeout(() => deletarRegistro(r.id), 900); };
+            const cancelarPressionamento = () => { tr.classList.remove('row-pressing'); if (timerSegurar) clearTimeout(timerSegurar); };
+            tr.addEventListener('touchstart', iniciarPressionamento, { passive: true });
+            tr.addEventListener('touchend', cancelarPressionamento);
+            tr.addEventListener('touchmove', cancelarPressionamento);
+            tr.addEventListener('mousedown', iniciarPressionamento);
+            tr.addEventListener('mouseup', cancelarPressionamento);
+            tr.addEventListener('mouseleave', cancelarPressionamento);
 
             tabelaContainer.appendChild(tr);
         });
@@ -816,20 +968,20 @@
         const registros = ordenarRegistros(obterRegistros());
 
         if (registros.length === 0) {
-            alert('Não há registros para exportar!');
+            alert('N茫o h谩 registros para exportar!');
             return;
         }
 
         const dadosExcel = registros.map(r => ({
-            'Data da Instalação': formatarData(r.data),
-            'Número do Pedido': r.pedido,
+            'Data da Instala莽茫o': formatarData(r.data),
+            'N煤mero do Pedido': r.pedido,
             'Valor (R$)': r.valor,
             'Status': r.status
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Instalações");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Instala莽玫es");
 
         worksheet['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 16 }];
 
@@ -840,7 +992,7 @@
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!confirm('Atenção: A importação irá substituir todos os registros atuais. Deseja continuar?')) {
+        if (!confirm('Aten莽茫o: A importa莽茫o ir谩 substituir todos os registros atuais. Deseja continuar?')) {
             e.target.value = '';
             return;
         }
@@ -874,8 +1026,8 @@
                     const keys = Object.keys(row);
                     const chaveData = keys.find(k => /data/i.test(k));
                     const chavePedido = keys.find(k => /pedido|numero|num/i.test(k));
-                    const chaveValor = keys.find(k => /valor|preço|preco/i.test(k));
-                    const chaveStatus = keys.find(k => /status|situacao|situação/i.test(k));
+                    const chaveValor = keys.find(k => /valor|pre莽o|preco/i.test(k));
+                    const chaveStatus = keys.find(k => /status|situacao|situa莽茫o/i.test(k));
 
                     const valData = chaveData ? row[chaveData] : '';
                     const valPedido = chavePedido ? row[chavePedido] : '';
@@ -887,10 +1039,14 @@
                     const valor = parseValorNumerico(valValor);
                     
                     let status = String(valStatus).trim();
-                    if (/instalado/i.test(status) && !/não|nao/i.test(status)) {
+                    if (/instalado/i.test(status) && !/n茫o|nao/i.test(status)) {
                         status = 'Instalado';
-                    } else if (/não|nao/i.test(status)) {
-                        status = 'Não Instalado';
+                    } else if (/eliminado/i.test(status)) {
+                        status = 'Eliminado';
+                    } else if (/cancelado/i.test(status)) {
+                        status = 'Cancelado';
+                    } else if (/n茫o|nao/i.test(status)) {
+                        status = 'N茫o Instalado';
                     } else {
                         status = 'Pendente';
                     }
@@ -912,7 +1068,7 @@
                     carregarRegistros();
                     alert(`${novosRegistros.length} registros importados com sucesso!`);
                 } else {
-                    alert('Não foi possível identificar colunas válidas no arquivo.');
+                    alert('N茫o foi poss铆vel identificar colunas v谩lidas no arquivo.');
                 }
             } catch (err) {
                 alert('Erro ao processar o arquivo Excel: ' + err.message);
