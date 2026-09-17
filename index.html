@@ -946,13 +946,27 @@
                     </select>
                 </td>
                 <td style="text-align: center;">
-                    <button type="button" class="btn-edit" onclick="editarRegistro(${r.id})">Editar</button>
+                    <button type="button" class="btn-edit" data-id="${r.id}">Editar</button>
                 </td>
             `;
 
+            const btnEdit = tr.querySelector('.btn-edit');
+            btnEdit.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editarRegistro(r.id);
+            });
+
             let timerSegurar = null;
-            const iniciarPressionamento = () => { tr.classList.add('row-pressing'); timerSegurar = setTimeout(() => deletarRegistro(r.id), 900); };
-            const cancelarPressionamento = () => { tr.classList.remove('row-pressing'); if (timerSegurar) clearTimeout(timerSegurar); };
+            const iniciarPressionamento = (e) => { 
+                if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
+                tr.classList.add('row-pressing'); 
+                timerSegurar = setTimeout(() => deletarRegistro(r.id), 900); 
+            };
+            const cancelarPressionamento = () => { 
+                tr.classList.remove('row-pressing'); 
+                if (timerSegurar) clearTimeout(timerSegurar); 
+            };
+
             tr.addEventListener('touchstart', iniciarPressionamento, { passive: true });
             tr.addEventListener('touchend', cancelarPressionamento);
             tr.addEventListener('touchmove', cancelarPressionamento);
