@@ -603,13 +603,13 @@
     const itensPorPagina = 10;
     let pizzaChart = null;
 
-    // --- Tabela de Regras de Comissão ---
+    // --- Tabela de Regras de Comissão Gradual (Faixas com limite mínimo e máximo) ---
     const REGRAS_COMISSAO = [
-        { meta: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
-        { meta: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
-        { meta: 11400, taxa: 0.030, nome: "Faixa 3 (3.0%)" },
-        { meta: 15200, taxa: 0.035, nome: "Faixa 4 (3.5%)" },
-        { meta: 19000, taxa: 0.040, nome: "Faixa 5 (4.0%)" }
+        { min: 0, max: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
+        { min: 3800, max: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
+        { min: 7600, max: 11400, taxa: 0.030, nome: "Faixa 3 (3.0%)" },
+        { min: 11400, max: 15200, taxa: 0.035, nome: "Faixa 4 (3.5%)" },
+        { min: 15200, max: 19000, taxa: 0.040, nome: "Faixa 5 (4.0%)" }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -834,33 +834,34 @@
         });
     }
 
-    // --- Função para Calcular e Exibir Comissão no Card ---
+    // --- Função para Calcular a Comissão Gradual por Faixas ---
     function calcularComissao(valorRealizado) {
-        let taxaAtual = 0;
-        let faixaNome = "Faixa Inicial (0.0%)";
+        let valorComissaoTotal = 0;
+        let faixaAtualNome = "Faixa Inicial (0.0%)";
         let proximaFaixa = REGRAS_COMISSAO[0];
-        let pctProgresso = 0;
 
-        for (let i = 0; i < REGRAS_COMISSAO.length; i++) {
-            if (valorRealizado >= REGRAS_COMISSAO[i].meta) {
-                taxaAtual = REGRAS_COMISSAO[i].taxa;
-                faixaNome = REGRAS_COMISSAO[i].nome;
-                proximaFaixa = REGRAS_COMISSAO[i + 1] || null;
+        REGRAS_COMISSAO.forEach(regra => {
+            if (valorRealizado > regra.min) {
+                const valorNaFaixa = Math.min(valorRealizado, regra.max) - regra.min;
+                valorComissaoTotal += valorNaFaixa * regra.taxa;
+                faixaAtualNome = regra.nome;
             }
-        }
+        });
 
-        const valorComissao = valorRealizado * taxaAtual;
+        // Identifica qual é a próxima faixa a ser atingida
+        proximaFaixa = REGRAS_COMISSAO.find(r => valorRealizado < r.max) || null;
 
-        document.getElementById('comissaoValor').innerText = formatarMoeda(valorComissao);
-        document.getElementById('comissaoFaixa').innerText = faixaNome;
+        document.getElementById('comissaoValor').innerText = formatarMoeda(valorComissaoTotal);
+        document.getElementById('comissaoFaixa').innerText = faixaAtualNome;
 
         const barraEl = document.getElementById('progressoBarra');
         const textoEl = document.getElementById('progressoTexto');
 
         if (proximaFaixa) {
-            const faltaMeta = proximaFaixa.meta - valorRealizado;
-            const baseAnterior = (taxaAtual > 0) ? (REGRAS_COMISSAO.find(r => r.taxa === taxaAtual)?.meta || 0) : 0;
-            pctProgresso = Math.min(100, Math.max(0, ((valorRealizado - baseAnterior) / (proximaFaixa.meta - baseAnterior)) * 100));
+            const faltaMeta = proximaFaixa.max - valorRealizado;
+            const alcanceFaixa = proximaFaixa.max - proximaFaixa.min;
+            const progressoNaFaixa = Math.max(0, valorRealizado - proximaFaixa.min);
+            const pctProgresso = Math.min(100, Math.max(0, (progressoNaFaixa / alcanceFaixa) * 100));
 
             barraEl.style.width = pctProgresso + '%';
             textoEl.innerText = `Faltam ${formatarMoeda(faltaMeta)} para atingir a ${proximaFaixa.nome}`;
