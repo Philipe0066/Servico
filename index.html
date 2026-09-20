@@ -199,8 +199,18 @@
             max-width: 180px;
             margin: 12px auto 0 auto;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+        }
+
+        .app-version-tag {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            margin-top: 8px;
+            text-align: center;
+            user-select: none;
         }
 
         .card {
@@ -519,6 +529,7 @@
             <!-- Gráfico de Pizza Centralizado -->
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
+                <div class="app-version-tag" id="appVersion">ver:1.1</div>
             </div>
         </div>
     </div>
@@ -599,6 +610,9 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
+    // Controle de Versão do Sistema
+    const VERSAO_SISTEMA = "ver:1.1";
+    
     let paginaAtual = 1;
     const itensPorPagina = 10;
     let pizzaChart = null;
@@ -620,6 +634,13 @@
     function toggleMenu() {
         document.getElementById('menuDrawer').classList.toggle('active');
         document.getElementById('menuOverlay').classList.toggle('active');
+    }
+
+    function atualizarDisplayVersao() {
+        const versionEl = document.getElementById('appVersion');
+        if (versionEl) {
+            versionEl.innerText = VERSAO_SISTEMA;
+        }
     }
 
     form.addEventListener('submit', function(e) {
@@ -678,7 +699,7 @@
 
     function editarRegistro(id) {
         const registros = obterRegistros();
-        const reg = registros.find(r => r.id === id);
+        const reg = registros.find(r => r.id === Number(id));
         if (!reg) return;
 
         document.getElementById('editId').value = reg.id;
@@ -695,9 +716,9 @@
 
     function deletarRegistro(id) {
         let registros = obterRegistros();
-        const reg = registros.find(r => r.id === id);
+        const reg = registros.find(r => r.id === Number(id));
         if (confirm(`Deseja apagar o registro do pedido #${reg ? reg.pedido : ''}?`)) {
-            registros = registros.filter(r => r.id !== id);
+            registros = registros.filter(r => r.id !== Number(id));
             localStorage.setItem('registros_instalacao', JSON.stringify(registros));
             carregarRegistros();
         }
@@ -903,6 +924,7 @@
         const registrosOrdenados = ordenarRegistros(todosRegistros);
 
         atualizarTotais(todosRegistros);
+        atualizarDisplayVersao();
 
         const totalPaginas = Math.ceil(registrosOrdenados.length / itensPorPagina) || 1;
         if (paginaAtual < 1) paginaAtual = 1;
@@ -923,6 +945,7 @@
         }
 
         registrosPaginados.forEach(r => {
+            const itemOriginal = todosRegistros.find(item => item.id === r.id);
             const tr = document.createElement('tr');
 
             tr.innerHTML = `
@@ -951,14 +974,14 @@
             const selectStatus = tr.querySelector('.status-select');
             selectStatus.addEventListener('change', (e) => {
                 e.stopPropagation();
-                atualizarStatus(r.id, e.target.value);
+                atualizarStatus(itemOriginal.id, e.target.value);
             });
 
             // Configuração do Botão Editar isolado
             const btnEdit = tr.querySelector('.btn-edit');
             btnEdit.addEventListener('click', (e) => {
                 e.stopPropagation();
-                editarRegistro(r.id);
+                editarRegistro(itemOriginal.id);
             });
 
             // Configuração do toque prolongado para excluir
@@ -966,7 +989,7 @@
             const iniciarPressionamento = (e) => { 
                 if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
                 tr.classList.add('row-pressing'); 
-                timerSegurar = setTimeout(() => deletarRegistro(r.id), 900); 
+                timerSegurar = setTimeout(() => deletarRegistro(itemOriginal.id), 900); 
             };
             const cancelarPressionamento = () => { 
                 tr.classList.remove('row-pressing'); 
