@@ -381,7 +381,6 @@
             background-color: var(--input-bg);
         }
 
-        /* Card de Comissão */
         .commission-card {
             background: var(--input-bg);
             border: 1px solid var(--border-color);
@@ -439,7 +438,6 @@
             margin-top: 4px;
         }
 
-        /* Indicador visual ao segurar para apagar */
         tr.row-pressing {
             background-color: rgba(248, 113, 113, 0.3) !important;
             transition: background-color 0.8s ease;
@@ -458,7 +456,6 @@
         <h1>Controle de Instalações</h1>
     </header>
 
-    <!-- Overlay e Menu Lateral -->
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
     <div class="menu-drawer" id="menuDrawer">
         <div class="menu-header">
@@ -511,15 +508,13 @@
                 <div class="progress-text" id="progressoTexto">Faltam R$ 3.800,00 para atingir a Faixa 1 (2.0%)</div>
             </div>
 
-            <!-- Gráfico de Pizza Centralizado -->
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.1</div>
+                <div class="app-version-tag" id="appVersion">ver:1.2</div>
             </div>
         </div>
     </div>
 
-    <!-- Cadastro / Edição -->
     <div class="card">
         <form id="instalacaoForm">
             <input type="hidden" id="editId">
@@ -554,7 +549,6 @@
         </form>
     </div>
 
-    <!-- Barra de Ações -->
     <div class="actions-bar">
         <select id="ordemSelect" class="order-select" onchange="carregarRegistros()">
             <option value="data">Ordem: Data</option>
@@ -565,7 +559,6 @@
         <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="importarDoExcel(event)">
     </div>
 
-    <!-- Tabela de Registros -->
     <div class="table-container">
         <table>
             <thead>
@@ -586,12 +579,9 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    // Controle de Versão do Sistema
-    const VERSAO_SISTEMA = "ver:1.1";
-    
+    const VERSAO_SISTEMA = "ver:1.2";
     let pizzaChart = null;
 
-    // --- Tabela de Regras de Comissão Gradual ---
     const REGRAS_COMISSAO = [
         { min: 0, max: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
         { min: 3800, max: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
@@ -631,7 +621,7 @@
         if (editId) {
             atualizarRegistroExistente(Number(editId), registroData);
         } else {
-            salvarRegistro({ id: Date.now() + Math.floor(Math.random() * 1000), ...registroData });
+            salvarRegistro({ id: Date.now(), ...registroData });
         }
 
         cancelarEdicao();
@@ -654,16 +644,16 @@
 
     function atualizarRegistroExistente(id, dadosNovos) {
         let registros = obterRegistros();
-        const index = registros.findIndex(r => r.id === id);
+        const index = registros.findIndex(r => String(r.id) === String(id));
         if (index !== -1) {
-            registros[index] = { id, ...dadosNovos };
+            registros[index] = { id: registros[index].id, ...dadosNovos };
             localStorage.setItem('registros_instalacao', JSON.stringify(registros));
         }
     }
 
     function atualizarStatus(id, novoStatus) {
         let registros = obterRegistros();
-        const registro = registros.find(r => r.id === id);
+        const registro = registros.find(r => String(r.id) === String(id));
         if (registro) {
             registro.status = novoStatus;
             localStorage.setItem('registros_instalacao', JSON.stringify(registros));
@@ -673,7 +663,7 @@
 
     function editarRegistro(id) {
         const registros = obterRegistros();
-        const reg = registros.find(r => r.id === Number(id));
+        const reg = registros.find(r => String(r.id) === String(id));
         if (!reg) return;
 
         document.getElementById('editId').value = reg.id;
@@ -690,9 +680,9 @@
 
     function deletarRegistro(id) {
         let registros = obterRegistros();
-        const reg = registros.find(r => r.id === Number(id));
+        const reg = registros.find(r => String(r.id) === String(id));
         if (confirm(`Deseja apagar o registro do pedido #${reg ? reg.pedido : ''}?`)) {
-            registros = registros.filter(r => r.id !== Number(id));
+            registros = registros.filter(r => String(r.id) !== String(id));
             localStorage.setItem('registros_instalacao', JSON.stringify(registros));
             carregarRegistros();
         }
@@ -927,21 +917,18 @@
                 </td>
             `;
 
-            // Configuração do Select de Status isolado
             const selectStatus = tr.querySelector('.status-select');
             selectStatus.addEventListener('change', (e) => {
                 e.stopPropagation();
                 atualizarStatus(r.id, e.target.value);
             });
 
-            // Configuração do Botão Editar isolado
             const btnEdit = tr.querySelector('.btn-edit');
             btnEdit.addEventListener('click', (e) => {
                 e.stopPropagation();
                 editarRegistro(r.id);
             });
 
-            // Configuração do toque prolongado para excluir
             let timerSegurar = null;
             const iniciarPressionamento = (e) => { 
                 if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
@@ -1020,7 +1007,6 @@
                 }
 
                 const novosRegistros = [];
-                const baseTimestamp = Date.now();
 
                 jsonDados.forEach((row, index) => {
                     const keys = Object.keys(row);
@@ -1053,7 +1039,8 @@
 
                     if (pedido) {
                         novosRegistros.push({
-                            id: baseTimestamp + index + Math.floor(Math.random() * 100),
+                            // Gerador de ID único infalível por pedido e linha da importação
+                            id: Number(`${Date.now()}${index}${Math.floor(Math.random() * 1000)}`),
                             data: dataIso || new Date().toISOString().slice(0, 10),
                             pedido: pedido,
                             valor: valor,
