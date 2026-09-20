@@ -603,7 +603,7 @@
     const itensPorPagina = 10;
     let pizzaChart = null;
 
-    // --- Tabela de Regras de Comissão Gradual (Faixas com limite mínimo e máximo) ---
+    // --- Tabela de Regras de Comissão Gradual ---
     const REGRAS_COMISSAO = [
         { min: 0, max: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
         { min: 3800, max: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
@@ -693,7 +693,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- Função de Deletar Registro ---
     function deletarRegistro(id) {
         let registros = obterRegistros();
         const reg = registros.find(r => r.id === id);
@@ -834,7 +833,6 @@
         });
     }
 
-    // --- Função para Calcular a Comissão Gradual por Faixas ---
     function calcularComissao(valorRealizado) {
         let valorComissaoTotal = 0;
         let faixaAtualNome = "Faixa Inicial (0.0%)";
@@ -848,7 +846,6 @@
             }
         });
 
-        // Identifica qual é a próxima faixa a ser atingida
         proximaFaixa = REGRAS_COMISSAO.find(r => valorRealizado < r.max) || null;
 
         document.getElementById('comissaoValor').innerText = formatarMoeda(valorComissaoTotal);
@@ -937,8 +934,7 @@
                 </td>
                 <td>${formatarMoeda(r.valor)}</td>
                 <td>
-                    <select class="status-select ${obterClasseStatus(r.status)}" 
-                            onchange="atualizarStatus(${r.id}, this.value)">
+                    <select class="status-select ${obterClasseStatus(r.status)}">
                         <option value="Pendente" ${r.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                         <option value="Instalado" ${r.status === 'Instalado' ? 'selected' : ''}>Instalado</option>
                         <option value="Não Instalado" ${r.status === 'Não Instalado' ? 'selected' : ''}>Não Instalado</option>
@@ -947,16 +943,25 @@
                     </select>
                 </td>
                 <td style="text-align: center;">
-                    <button type="button" class="btn-edit" data-id="${r.id}">Editar</button>
+                    <button type="button" class="btn-edit">Editar</button>
                 </td>
             `;
 
+            // Configuração do Select de Status isolado
+            const selectStatus = tr.querySelector('.status-select');
+            selectStatus.addEventListener('change', (e) => {
+                e.stopPropagation();
+                atualizarStatus(r.id, e.target.value);
+            });
+
+            // Configuração do Botão Editar isolado
             const btnEdit = tr.querySelector('.btn-edit');
             btnEdit.addEventListener('click', (e) => {
                 e.stopPropagation();
                 editarRegistro(r.id);
             });
 
+            // Configuração do toque prolongado para excluir
             let timerSegurar = null;
             const iniciarPressionamento = (e) => { 
                 if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
