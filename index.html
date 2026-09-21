@@ -9,8 +9,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Instalações">
 
-    <!-- Ícone para Atalho na Tela Inicial (Android & iOS) -->
-    <link rel="apple-touch-icon" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
+    <!-- Ícone em formato de imagem bitmap (PNG) para Android e iOS não deixarem o fundo branco -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://instala.leroymerlin.com.br/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://instala.leroymerlin.com.br/favicon.png">
     <link rel="icon" type="image/svg+xml" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -519,7 +520,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.7</div>
+                <div class="app-version-tag" id="appVersion">ver:1.8</div>
             </div>
         </div>
     </div>
@@ -596,7 +597,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.7";
+    const VERSAO_SISTEMA = "ver:1.8";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
