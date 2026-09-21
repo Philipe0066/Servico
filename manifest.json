@@ -1,22 +1,17 @@
 {
   "name": "Controle de Instalações",
   "short_name": "Instalações",
-  "start_url": "./index.html",
+  "start_url": ".",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#183729",
   "theme_color": "#183729",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://instala.leroymerlin.com.br/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://instala.leroymerlin.com.br/favicon.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23183729'/><polygon points='256,70 440,410 72,410' fill='%2300B050'/><polygon points='256,70 440,410 256,410' fill='%23008000'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
