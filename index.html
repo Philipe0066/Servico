@@ -512,7 +512,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.3</div>
+                <div class="app-version-tag" id="appVersion">ver:1.4</div>
             </div>
         </div>
     </div>
@@ -551,7 +551,6 @@
         </form>
     </div>
 
-    <!-- Barra de Ações Atualizada com Filtro por Status -->
     <div class="actions-bar">
         <select id="ordemSelect" class="order-select" onchange="carregarRegistros()">
             <option value="data">Ordem: Data</option>
@@ -590,7 +589,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.3";
+    const VERSAO_SISTEMA = "ver:1.4";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
@@ -618,6 +617,16 @@
         }
     }
 
+    function obterDataHoraAtual() {
+        const agora = new Date();
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const mes = String(agora.getMonth() + 1).padStart(2, '0');
+        const ano = agora.getFullYear();
+        const hora = String(agora.getHours()).padStart(2, '0');
+        const min = String(agora.getMinutes()).padStart(2, '0');
+        return `${dia}/${mes}/${ano} ${hora}:${min}`;
+    }
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -632,7 +641,11 @@
         if (editId) {
             atualizarRegistroExistente(Number(editId), registroData);
         } else {
-            salvarRegistro({ id: Date.now(), ...registroData });
+            salvarRegistro({ 
+                id: Date.now(), 
+                ...registroData,
+                dataCriacao: obterDataHoraAtual()
+            });
         }
 
         cancelarEdicao();
@@ -657,7 +670,10 @@
         let registros = obterRegistros();
         const index = registros.findIndex(r => String(r.id) === String(id));
         if (index !== -1) {
-            registros[index] = { id: registros[index].id, ...dadosNovos };
+            registros[index] = { 
+                ...registros[index], 
+                ...dadosNovos 
+            };
             localStorage.setItem('registros_instalacao', JSON.stringify(registros));
         }
     }
@@ -904,11 +920,9 @@
     function carregarRegistros() {
         const todosRegistros = obterRegistros();
         
-        // Atualiza os totais acumulados e gráfico considerando todos os registros da base
         atualizarTotais(todosRegistros);
         atualizarDisplayVersao();
 
-        // Aplica ordenação e o filtro selecionado do usuário para exibição na tabela
         const registrosOrdenados = ordenarRegistros(todosRegistros);
         const registrosFiltrados = filtrarRegistros(registrosOrdenados);
 
@@ -986,18 +1000,20 @@
             return;
         }
 
+        // Adicionada a coluna "Data de Criação" na exportação
         const dadosExcel = registros.map(r => ({
             'Data da Instalação': formatarData(r.data),
             'Número do Pedido': r.pedido,
             'Valor (R$)': r.valor,
-            'Status': r.status
+            'Status': r.status,
+            'Data de Criação': r.dataCriacao || 'N/A'
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Instalações");
 
-        worksheet['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 16 }];
+        worksheet['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 20 }];
 
         XLSX.writeFile(workbook, "Relatorio_Instalacoes.xlsx");
     }
@@ -1034,18 +1050,21 @@
                 }
 
                 const novosRegistros = [];
+                const dataHoraImportacao = obterDataHoraAtual();
 
                 jsonDados.forEach((row, index) => {
                     const keys = Object.keys(row);
-                    const chaveData = keys.find(k => /data/i.test(k));
+                    const chaveData = keys.find(k => /data/i.test(k) && !/criação|criacao/i.test(k));
                     const chavePedido = keys.find(k => /pedido|numero|num/i.test(k));
                     const chaveValor = keys.find(k => /valor|preço|preco/i.test(k));
                     const chaveStatus = keys.find(k => /status|situacao|situação/i.test(k));
+                    const chaveCriacao = keys.find(k => /criação|criacao/i.test(k));
 
                     const valData = chaveData ? row[chaveData] : '';
                     const valPedido = chavePedido ? row[chavePedido] : '';
                     const valValor = chaveValor ? row[chaveValor] : 0;
                     const valStatus = chaveStatus ? row[chaveStatus] : '';
+                    const valCriacao = chaveCriacao ? row[chaveCriacao] : '';
 
                     const dataIso = converterDataParaISO(valData);
                     const pedido = String(valPedido || `IMP-${index + 1}`).trim();
@@ -1070,7 +1089,8 @@
                             data: dataIso || new Date().toISOString().slice(0, 10),
                             pedido: pedido,
                             valor: valor,
-                            status: status
+                            status: status,
+                            dataCriacao: valCriacao || dataHoraImportacao
                         });
                     }
                 });
