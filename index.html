@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Instalações</title>
     <meta name="theme-color" content="#183729">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Ícone padrão para navegadores -->
-    <link rel="icon" type="image/svg+xml" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
+    <!-- Conexão ao Manifest local -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Ícones locais -->
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="icon" type="image/png" href="favicon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -456,7 +463,7 @@
 <div class="container">
     <header>
         <button class="btn-logo-menu" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
-            <img src="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg" alt="Logomarca">
+            <img src="favicon.png" alt="Logomarca">
         </button>
         <h1>Controle de Instalações</h1>
     </header>
@@ -515,7 +522,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:2.4</div>
+                <div class="app-version-tag" id="appVersion">ver:3.0</div>
             </div>
         </div>
     </div>
@@ -589,10 +596,18 @@
 </div>
 
 <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker Registrado!', reg))
+                .catch(err => console.error('Erro no Service Worker:', err));
+        });
+    }
+
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:2.4";
+    const VERSAO_SISTEMA = "ver:3.0";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
