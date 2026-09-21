@@ -54,21 +54,24 @@
             margin: 0 auto;
         }
 
+        /* Header ajustado para centralização perfeita do título */
         header {
             margin-bottom: 16px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 12px;
             position: relative;
+            justify-content: center;
+            min-height: 44px;
         }
 
         h1 {
             color: #EBEBEB;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
+            text-align: center;
         }
 
+        /* Botão posicionado à esquerda sem empurrar o título */
         .btn-logo-menu {
             background: transparent;
             border: none;
@@ -77,7 +80,8 @@
             align-items: center;
             justify-content: center;
             padding: 0;
-            flex-shrink: 0;
+            position: absolute;
+            left: 0;
             transition: transform 0.2s ease;
         }
 
@@ -85,9 +89,10 @@
             transform: scale(0.92);
         }
 
+        /* Ícone aumentado */
         .btn-logo-menu img {
-            width: 32px;
-            height: 32px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
         }
 
@@ -511,7 +516,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.5</div>
+                <div class="app-version-tag" id="appVersion">ver:1.6</div>
             </div>
         </div>
     </div>
@@ -588,7 +593,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.5";
+    const VERSAO_SISTEMA = "ver:1.6";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
