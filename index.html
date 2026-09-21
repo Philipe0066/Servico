@@ -6,6 +6,12 @@
     <title>Controle de Instalações</title>
     <meta name="theme-color" content="#183729">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Instalações">
+
+    <!-- Ícone para Atalho na Tela Inicial (Android & iOS) -->
+    <link rel="apple-touch-icon" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
+    <link rel="icon" type="image/svg+xml" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +60,6 @@
             margin: 0 auto;
         }
 
-        /* Header ajustado para centralização perfeita do título */
         header {
             margin-bottom: 16px;
             display: flex;
@@ -71,7 +76,6 @@
             text-align: center;
         }
 
-        /* Botão posicionado à esquerda sem empurrar o título */
         .btn-logo-menu {
             background: transparent;
             border: none;
@@ -89,7 +93,6 @@
             transform: scale(0.92);
         }
 
-        /* Ícone aumentado */
         .btn-logo-menu img {
             width: 42px;
             height: 42px;
@@ -516,7 +519,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.6</div>
+                <div class="app-version-tag" id="appVersion">ver:1.7</div>
             </div>
         </div>
     </div>
@@ -593,7 +596,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.6";
+    const VERSAO_SISTEMA = "ver:1.7";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
