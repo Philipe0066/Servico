@@ -296,10 +296,12 @@
             gap: 8px;
             margin-bottom: 12px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .order-select {
-            flex: 1.2;
+        .order-select, .filter-select {
+            flex: 1;
+            min-width: 130px;
         }
 
         .table-container {
@@ -510,7 +512,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.2</div>
+                <div class="app-version-tag" id="appVersion">ver:1.3</div>
             </div>
         </div>
     </div>
@@ -549,11 +551,20 @@
         </form>
     </div>
 
+    <!-- Barra de Ações Atualizada com Filtro por Status -->
     <div class="actions-bar">
         <select id="ordemSelect" class="order-select" onchange="carregarRegistros()">
             <option value="data">Ordem: Data</option>
             <option value="pedido">Ordem: Pedido</option>
         </select>
+        
+        <select id="filtroSelect" class="filter-select" onchange="carregarRegistros()">
+            <option value="Todos">Filtro: Todos</option>
+            <option value="Instalado">Instalados</option>
+            <option value="Pendente">Pendentes</option>
+            <option value="NaoRealizados">Cancelados / Eliminados / Não Instalados</option>
+        </select>
+
         <button type="button" class="btn-excel" onclick="exportarParaExcel()">📊 Exportar</button>
         <button type="button" class="btn-import" onclick="document.getElementById('fileInput').click()">📥 Importar</button>
         <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="importarDoExcel(event)">
@@ -579,7 +590,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.2";
+    const VERSAO_SISTEMA = "ver:1.3";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
@@ -782,6 +793,18 @@
         });
     }
 
+    function filtrarRegistros(registros) {
+        const filtro = document.getElementById('filtroSelect').value;
+
+        if (filtro === 'Todos') return registros;
+        if (filtro === 'Instalado') return registros.filter(r => r.status === 'Instalado');
+        if (filtro === 'Pendente') return registros.filter(r => r.status === 'Pendente');
+        if (filtro === 'NaoRealizados') {
+            return registros.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
+        }
+        return registros;
+    }
+
     function inicializarGrafico() {
         const ctx = document.getElementById('statusChart').getContext('2d');
 
@@ -880,19 +903,23 @@
 
     function carregarRegistros() {
         const todosRegistros = obterRegistros();
-        const registrosOrdenados = ordenarRegistros(todosRegistros);
-
+        
+        // Atualiza os totais acumulados e gráfico considerando todos os registros da base
         atualizarTotais(todosRegistros);
         atualizarDisplayVersao();
 
+        // Aplica ordenação e o filtro selecionado do usuário para exibição na tabela
+        const registrosOrdenados = ordenarRegistros(todosRegistros);
+        const registrosFiltrados = filtrarRegistros(registrosOrdenados);
+
         tabelaContainer.innerHTML = '';
 
-        if (registrosOrdenados.length === 0) {
-            tabelaContainer.innerHTML = `<tr><td colspan="5" class="empty-msg">Nenhum registro.</td></tr>`;
+        if (registrosFiltrados.length === 0) {
+            tabelaContainer.innerHTML = `<tr><td colspan="5" class="empty-msg">Nenhum registro encontrado para este filtro.</td></tr>`;
             return;
         }
 
-        registrosOrdenados.forEach(r => {
+        registrosFiltrados.forEach(r => {
             const tr = document.createElement('tr');
 
             tr.innerHTML = `
@@ -1039,7 +1066,6 @@
 
                     if (pedido) {
                         novosRegistros.push({
-                            // Gerador de ID único infalível por pedido e linha da importação
                             id: Number(`${Date.now()}${index}${Math.floor(Math.random() * 1000)}`),
                             data: dataIso || new Date().toISOString().slice(0, 10),
                             pedido: pedido,
