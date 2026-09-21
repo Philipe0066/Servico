@@ -59,7 +59,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 16px;
+            gap: 12px;
             position: relative;
         }
 
@@ -69,25 +69,26 @@
             font-weight: 700;
         }
 
-        .btn-hamburger {
+        .btn-logo-menu {
             background: transparent;
             border: none;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 28px;
-            height: 24px;
+            align-items: center;
+            justify-content: center;
             padding: 0;
             flex-shrink: 0;
+            transition: transform 0.2s ease;
         }
 
-        .btn-hamburger span {
-            width: 100%;
-            height: 3px;
-            background-color: #EBEBEB;
-            border-radius: 2px;
-            transition: all 0.3s ease;
+        .btn-logo-menu:active {
+            transform: scale(0.92);
+        }
+
+        .btn-logo-menu img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
         .menu-overlay {
@@ -450,10 +451,8 @@
 
 <div class="container">
     <header>
-        <button class="btn-hamburger" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
-            <span></span>
-            <span></span>
-            <span></span>
+        <button class="btn-logo-menu" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
+            <img src="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg" alt="Logomarca">
         </button>
         <h1>Controle de Instalações</h1>
     </header>
@@ -512,7 +511,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:1.4</div>
+                <div class="app-version-tag" id="appVersion">ver:1.5</div>
             </div>
         </div>
     </div>
@@ -589,7 +588,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:1.4";
+    const VERSAO_SISTEMA = "ver:1.5";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
@@ -1000,7 +999,6 @@
             return;
         }
 
-        // Adicionada a coluna "Data de Criação" na exportação
         const dadosExcel = registros.map(r => ({
             'Data da Instalação': formatarData(r.data),
             'Número do Pedido': r.pedido,
