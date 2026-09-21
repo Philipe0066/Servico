@@ -1,0 +1,18 @@
+{
+  "name": "Controle de Instalações",
+  "short_name": "Instalações",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#183729",
+  "theme_color": "#183729",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
