@@ -7,14 +7,16 @@
     <meta name="theme-color" content="#183729">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Instalações">
 
-    <!-- Ícone embutido diretamente em Base64 (Evita que o Android coloque o ícone "G" cinzento) -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23183729'/><polygon points='50,15 85,85 15,85' fill='%2300B050'/><polygon points='50,15 85,85 50,85' fill='%23008000'/></svg>">
-    <link rel="icon" type="image/svg+xml" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
+    <!-- Conexão ao Manifest PWA -->
+    <link rel="manifest" href="./manifest.json">
 
-    <!-- Web App Manifest com Ícone Base64 de Alta Definição -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Controle de Instalações","short_name":"Instalações","start_url":".","display":"standalone","background_color":"#183729","theme_color":"#183729","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23183729\"/><polygon points=\"50,15 85,85 15,85\" fill=\"%2300B050\"/><polygon points=\"50,15 85,85 50,85\" fill=\"%23008000\"/></svg>","sizes":"192x192 512x512","type":"image/svg+xml","purpose":"any maskable"}]}'>
+    <!-- Ícones para navegadores e Apple -->
+    <link rel="apple-touch-icon" href="https://instala.leroymerlin.com.br/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://instala.leroymerlin.com.br/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="https://instala.leroymerlin.com.br/assets/logomark-M1wTMKNQ.svg">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -522,7 +524,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:2.0</div>
+                <div class="app-version-tag" id="appVersion">ver:2.1</div>
             </div>
         </div>
     </div>
@@ -596,10 +598,19 @@
 </div>
 
 <script>
+    // Registro do Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker Registrado com Sucesso!', reg))
+                .catch(err => console.log('Falha ao registrar Service Worker:', err));
+        });
+    }
+
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:2.0";
+    const VERSAO_SISTEMA = "ver:2.1";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
