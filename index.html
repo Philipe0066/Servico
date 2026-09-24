@@ -40,8 +40,16 @@
             --warning-bg: #fef3c7;
             --danger: #ef4444;
             --danger-bg: #fee2e2;
+            --info: #0284c7;
+            --info-bg: #e0f2fe;
             --border-color: #bcece4;
             --radius: 12px;
+
+            /* Cores muito claras para o fundo das linhas da tabela */
+            --row-instalado-bg: #f0fdf4;
+            --row-feito-bg: #f0fdf4;
+            --row-pendente-bg: #fffbeb;
+            --row-cancelado-bg: #fef2f2;
         }
 
         * {
@@ -316,11 +324,14 @@
             min-width: 130px;
         }
 
+        /* Container Scrollável para a Tabela */
         .table-container {
             border-radius: var(--radius);
             border: 1px solid var(--border-color);
             background: var(--card-bg);
             width: 100%;
+            max-height: 380px;
+            overflow-y: auto;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
@@ -340,15 +351,14 @@
         }
 
         th {
+            position: sticky;
+            top: 0;
             background-color: #d8f3ee;
             color: var(--text-muted);
             font-weight: 600;
             font-size: 0.68rem;
             text-transform: uppercase;
-        }
-
-        td {
-            background-color: var(--input-bg);
+            z-index: 10;
         }
 
         th:nth-child(1), td:nth-child(1) { width: 22%; white-space: nowrap; }
@@ -356,6 +366,12 @@
         th:nth-child(3), td:nth-child(3) { width: 22%; }
         th:nth-child(4), td:nth-child(4) { width: 21%; }
         th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
+
+        /* Estilização suave das linhas da tabela */
+        tr.row-instalado td { background-color: var(--row-instalado-bg); }
+        tr.row-feito td { background-color: var(--row-feito-bg); }
+        tr.row-pendente td { background-color: var(--row-pendente-bg); }
+        tr.row-nao-instalado td { background-color: var(--row-cancelado-bg); }
 
         .pedido-link {
             color: var(--primary);
@@ -374,7 +390,9 @@
             width: 100%;
         }
 
+        /* Badges de Status do Select */
         .status-instalado { background-color: var(--success-bg); color: #065f46; }
+        .status-feito { background-color: var(--info-bg); color: #075985; }
         .status-nao-instalado { background-color: var(--danger-bg); color: #991b1b; }
         .status-pendente { background-color: var(--warning-bg); color: #92400e; }
 
@@ -498,6 +516,10 @@
                     <strong id="valorInstalados" style="color: var(--success);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
+                    <span>Valor Feito:</span>
+                    <strong id="valorFeito" style="color: var(--info);">R$ 0,00</strong>
+                </div>
+                <div class="status-summary-item">
                     <span>Valor Pendente:</span>
                     <strong id="valorPendentes" style="color: var(--warning);">R$ 0,00</strong>
                 </div>
@@ -522,7 +544,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:3.1</div>
+                <div class="app-version-tag" id="appVersion">ver:3.2</div>
             </div>
         </div>
     </div>
@@ -548,6 +570,7 @@
                     <select id="status" required>
                         <option value="Pendente">Pendente</option>
                         <option value="Instalado">Instalado</option>
+                        <option value="Feito">Feito</option>
                         <option value="Não Instalado">Não Instalado</option>
                         <option value="Eliminado">Eliminado</option>
                         <option value="Cancelado">Cancelado</option>
@@ -569,7 +592,7 @@
         
         <select id="filtroSelect" class="filter-select" onchange="carregarRegistros()">
             <option value="Todos">Filtro: Todos</option>
-            <option value="Instalado">Instalados</option>
+            <option value="Instalado">Instalados / Feitos</option>
             <option value="Pendente">Pendentes</option>
             <option value="NaoRealizados">Cancelados / Eliminados / Não Instalados</option>
         </select>
@@ -607,7 +630,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:3.1";
+    const VERSAO_SISTEMA = "ver:3.2";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
@@ -805,11 +828,25 @@
     function obterClasseStatus(status) {
         switch (status) {
             case 'Instalado': return 'status-instalado';
+            case 'Feito': return 'status-feito';
             case 'Não Instalado': 
             case 'Eliminado': 
             case 'Cancelado': 
                 return 'status-nao-instalado';
             case 'Pendente': return 'status-pendente';
+            default: return '';
+        }
+    }
+
+    function obterClasseLinha(status) {
+        switch (status) {
+            case 'Instalado': return 'row-instalado';
+            case 'Feito': return 'row-feito';
+            case 'Não Instalado': 
+            case 'Eliminado': 
+            case 'Cancelado': 
+                return 'row-nao-instalado';
+            case 'Pendente': return 'row-pendente';
             default: return '';
         }
     }
@@ -834,7 +871,7 @@
         const filtro = document.getElementById('filtroSelect').value;
 
         if (filtro === 'Todos') return registros;
-        if (filtro === 'Instalado') return registros.filter(r => r.status === 'Instalado');
+        if (filtro === 'Instalado') return registros.filter(r => r.status === 'Instalado' || r.status === 'Feito');
         if (filtro === 'Pendente') return registros.filter(r => r.status === 'Pendente');
         if (filtro === 'NaoRealizados') {
             return registros.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
@@ -849,7 +886,7 @@
             type: 'pie',
             plugins: [ChartDataLabels],
             data: {
-                labels: ['Feitas', 'Pendentes', 'Não Feitas'],
+                labels: ['Feitas/Instaladas', 'Pendentes', 'Não Feitas'],
                 datasets: [{
                     data: [0, 0, 0],
                     backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
@@ -915,27 +952,31 @@
 
     function atualizarTotais(registrosExibidos) {
         const instalados = registrosExibidos.filter(r => r.status === 'Instalado');
+        const feitos = registrosExibidos.filter(r => r.status === 'Feito');
         const pendentes = registrosExibidos.filter(r => r.status === 'Pendente');
         const naoInstalados = registrosExibidos.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
 
         const somaInstalados = instalados.reduce((acc, r) => acc + (r.valor || 0), 0);
+        const somaFeitos = feitos.reduce((acc, r) => acc + (r.valor || 0), 0);
         const somaPendentes = pendentes.reduce((acc, r) => acc + (r.valor || 0), 0);
         const somaNaoInstalados = naoInstalados.reduce((acc, r) => acc + (r.valor || 0), 0);
 
-        document.getElementById('qtdInstalados').innerText = instalados.length;
+        document.getElementById('qtdInstalados').innerText = instalados.length + feitos.length;
         document.getElementById('qtdPendentes').innerText = pendentes.length;
         document.getElementById('qtdNaoInstalados').innerText = naoInstalados.length;
 
         document.getElementById('valorInstalados').innerText = formatarMoeda(somaInstalados);
+        document.getElementById('valorFeito').innerText = formatarMoeda(somaFeitos);
         document.getElementById('valorPendentes').innerText = formatarMoeda(somaPendentes);
         document.getElementById('valorNaoInstalados').innerText = formatarMoeda(somaNaoInstalados);
 
         if (pizzaChart) {
-            pizzaChart.data.datasets[0].data = [instalados.length, pendentes.length, naoInstalados.length];
+            pizzaChart.data.datasets[0].data = [instalados.length + feitos.length, pendentes.length, naoInstalados.length];
             pizzaChart.update();
         }
 
-        calcularComissao(somaInstalados);
+        // Comissão calculada sobre Instalados + Feitos
+        calcularComissao(somaInstalados + somaFeitos);
     }
 
     function carregarRegistros() {
@@ -956,7 +997,8 @@
 
         registrosFiltrados.forEach(r => {
             const tr = document.createElement('tr');
-            tr.dataset.id = r.id; // Salva o ID exato diretamente no elemento TR
+            tr.dataset.id = r.id;
+            tr.className = obterClasseLinha(r.status);
 
             tr.innerHTML = `
                 <td>${formatarData(r.data)}</td>
@@ -970,6 +1012,7 @@
                     <select class="status-select ${obterClasseStatus(r.status)}">
                         <option value="Pendente" ${r.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                         <option value="Instalado" ${r.status === 'Instalado' ? 'selected' : ''}>Instalado</option>
+                        <option value="Feito" ${r.status === 'Feito' ? 'selected' : ''}>Feito</option>
                         <option value="Não Instalado" ${r.status === 'Não Instalado' ? 'selected' : ''}>Não Instalado</option>
                         <option value="Eliminado" ${r.status === 'Eliminado' ? 'selected' : ''}>Eliminado</option>
                         <option value="Cancelado" ${r.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
@@ -1095,6 +1138,8 @@
                     let status = String(valStatus).trim();
                     if (/instalado/i.test(status) && !/não|nao/i.test(status)) {
                         status = 'Instalado';
+                    } else if (/feito/i.test(status)) {
+                        status = 'Feito';
                     } else if (/eliminado/i.test(status)) {
                         status = 'Eliminado';
                     } else if (/cancelado/i.test(status)) {
