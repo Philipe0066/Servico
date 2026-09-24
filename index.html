@@ -9,12 +9,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Conexão ao Manifest local  -->
+    <!-- Conexão ao Manifest local -->
     <link rel="manifest" href="manifest.json">
 
     <!-- Ícones locais -->
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -463,7 +463,7 @@
 <div class="container">
     <header>
         <button class="btn-logo-menu" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
-            <img src="icon.png" alt="Logomarca">
+            <img src="favicon.png" alt="Logomarca">
         </button>
         <h1>Controle de Instalações</h1>
     </header>
@@ -522,7 +522,7 @@
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:3.0</div>
+                <div class="app-version-tag" id="appVersion">ver:3.1</div>
             </div>
         </div>
     </div>
@@ -607,7 +607,7 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:3.0";
+    const VERSAO_SISTEMA = "ver:3.1";
     let pizzaChart = null;
 
     const REGRAS_COMISSAO = [
@@ -723,12 +723,15 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function deletarRegistro(id) {
+    function deletarRegistro(idTarget) {
         let registros = obterRegistros();
-        const reg = registros.find(r => String(r.id) !== String(id));
-        if (confirm(`Deseja apagar o registro do pedido #${reg ? reg.pedido : ''}?`)) {
-            registros = registros.filter(r => String(r.id) !== String(id));
-            localStorage.setItem('registros_instalacao', JSON.stringify(registros));
+        const regAlvo = registros.find(r => String(r.id) === String(idTarget));
+        
+        if (!regAlvo) return;
+
+        if (confirm(`Deseja apagar o registro do pedido #${regAlvo.pedido}?`)) {
+            const novosRegistros = registros.filter(r => String(r.id) !== String(idTarget));
+            localStorage.setItem('registros_instalacao', JSON.stringify(novosRegistros));
             carregarRegistros();
         }
     }
@@ -953,6 +956,7 @@
 
         registrosFiltrados.forEach(r => {
             const tr = document.createElement('tr');
+            tr.dataset.id = r.id; // Salva o ID exato diretamente no elemento TR
 
             tr.innerHTML = `
                 <td>${formatarData(r.data)}</td>
@@ -979,20 +983,21 @@
             const selectStatus = tr.querySelector('.status-select');
             selectStatus.addEventListener('change', (e) => {
                 e.stopPropagation();
-                atualizarStatus(r.id, e.target.value);
+                atualizarStatus(tr.dataset.id, e.target.value);
             });
 
             const btnEdit = tr.querySelector('.btn-edit');
             btnEdit.addEventListener('click', (e) => {
                 e.stopPropagation();
-                editarRegistro(r.id);
+                editarRegistro(tr.dataset.id);
             });
 
             let timerSegurar = null;
             const iniciarPressionamento = (e) => { 
                 if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
                 tr.classList.add('row-pressing'); 
-                timerSegurar = setTimeout(() => deletarRegistro(r.id), 900); 
+                const targetId = tr.dataset.id;
+                timerSegurar = setTimeout(() => deletarRegistro(targetId), 900); 
             };
             const cancelarPressionamento = () => { 
                 tr.classList.remove('row-pressing'); 
