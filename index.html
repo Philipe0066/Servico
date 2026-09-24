@@ -47,7 +47,7 @@
 
             /* Cores muito claras para o fundo das linhas da tabela */
             --row-instalado-bg: #f0fdf4;
-            --row-feito-bg: #f0fdf4;
+            --row-feito-bg: #f0f9ff;
             --row-pendente-bg: #fffbeb;
             --row-cancelado-bg: #fef2f2;
         }
@@ -512,11 +512,11 @@
             <div class="menu-info-card">
                 <h4>💰 Valores Financeiros</h4>
                 <div class="status-summary-item">
-                    <span>Valor Realizado:</span>
+                    <span>Valores Faturados:</span>
                     <strong id="valorInstalados" style="color: var(--success);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Valor Feito:</span>
+                    <span>Valores a Faturar:</span>
                     <strong id="valorFeito" style="color: var(--info);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
@@ -530,21 +530,21 @@
             </div>
 
             <div class="commission-card">
-                <h4>🏷️ Sua comissão:</h4>
+                <h4>🏷️ Sua comissão (2.0%):</h4>
                 <div class="commission-row">
-                    <span class="commission-badge" id="comissaoFaixa">Faixa Inicial (0.0%)</span>
+                    <span class="commission-badge" id="comissaoFaixa">Meta: R$ 700,00</span>
                     <strong class="commission-val" id="comissaoValor">R$ 0,00</strong>
                 </div>
                 
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" id="progressoBarra"></div>
                 </div>
-                <div class="progress-text" id="progressoTexto">Faltam R$ 3.800,00 para atingir a Faixa 1 (2.0%)</div>
+                <div class="progress-text" id="progressoTexto">Faltam R$ 35.000,00 em instalações para atingir a meta</div>
             </div>
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:3.2</div>
+                <div class="app-version-tag" id="appVersion">ver:3.3</div>
             </div>
         </div>
     </div>
@@ -630,16 +630,13 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:3.2";
+    const VERSAO_SISTEMA = "ver:3.3";
     let pizzaChart = null;
 
-    const REGRAS_COMISSAO = [
-        { min: 0, max: 3800, taxa: 0.020, nome: "Faixa 1 (2.0%)" },
-        { min: 3800, max: 7600, taxa: 0.025, nome: "Faixa 2 (2.5%)" },
-        { min: 7600, max: 11400, taxa: 0.030, nome: "Faixa 3 (3.0%)" },
-        { min: 11400, max: 15200, taxa: 0.035, nome: "Faixa 4 (3.5%)" },
-        { min: 15200, max: 19000, taxa: 0.040, nome: "Faixa 5 (4.0%)" }
-    ];
+    // Configuração de Comissão Única (2.0% e Meta de R$ 700,00 de comissão)
+    const TAXA_COMISSAO_FIXA = 0.02;
+    const META_COMISSAO_VALOR = 700.00;
+    const META_VENDAS_BRUTAS = META_COMISSAO_VALOR / TAXA_COMISSAO_FIXA; // R$ 35.000,00 em vendas
 
     document.addEventListener('DOMContentLoaded', () => {
         inicializarGrafico();
@@ -915,38 +912,22 @@
         });
     }
 
-    function calcularComissao(valorRealizado) {
-        let valorComissaoTotal = 0;
-        let faixaAtualNome = "Faixa Inicial (0.0%)";
-        let proximaFaixa = REGRAS_COMISSAO[0];
+    function calcularComissao(valorVendasAcumulado) {
+        const comissaoAtual = valorVendasAcumulado * TAXA_COMISSAO_FIXA;
+        const vendasFaltantes = Math.max(0, META_VENDAS_BRUTAS - valorVendasAcumulado);
+        const pctMeta = Math.min(100, (comissaoAtual / META_COMISSAO_VALOR) * 100);
 
-        REGRAS_COMISSAO.forEach(regra => {
-            if (valorRealizado > regra.min) {
-                const valorNaFaixa = Math.min(valorRealizado, regra.max) - regra.min;
-                valorComissaoTotal += valorNaFaixa * regra.taxa;
-                faixaAtualNome = regra.nome;
-            }
-        });
-
-        proximaFaixa = REGRAS_COMISSAO.find(r => valorRealizado < r.max) || null;
-
-        document.getElementById('comissaoValor').innerText = formatarMoeda(valorComissaoTotal);
-        document.getElementById('comissaoFaixa').innerText = faixaAtualNome;
-
+        document.getElementById('comissaoValor').innerText = formatarMoeda(comissaoAtual);
+        
         const barraEl = document.getElementById('progressoBarra');
         const textoEl = document.getElementById('progressoTexto');
 
-        if (proximaFaixa) {
-            const faltaMeta = proximaFaixa.max - valorRealizado;
-            const alcanceFaixa = proximaFaixa.max - proximaFaixa.min;
-            const progressoNaFaixa = Math.max(0, valorRealizado - proximaFaixa.min);
-            const pctProgresso = Math.min(100, Math.max(0, (progressoNaFaixa / alcanceFaixa) * 100));
+        barraEl.style.width = pctMeta + '%';
 
-            barraEl.style.width = pctProgresso + '%';
-            textoEl.innerText = `Faltam ${formatarMoeda(faltaMeta)} para atingir a ${proximaFaixa.nome}`;
+        if (comissaoAtual >= META_COMISSAO_VALOR) {
+            textoEl.innerText = `🎉 Parabéns! Você superou a meta de R$ 700,00 de comissão!`;
         } else {
-            barraEl.style.width = '100%';
-            textoEl.innerText = `🎉 Parabéns! Você atingiu o nível máximo (Faixa 5 - 4.0%)`;
+            textoEl.innerText = `Faltam ${formatarMoeda(vendasFaltantes)} em instalações para atingir R$ 700,00 de comissão`;
         }
     }
 
@@ -975,7 +956,7 @@
             pizzaChart.update();
         }
 
-        // Comissão calculada sobre Instalados + Feitos
+        // Comissão calculada a 2% sobre Instalados + Feitos
         calcularComissao(somaInstalados + somaFeitos);
     }
 
