@@ -520,11 +520,11 @@
                     <strong id="valorFeito" style="color: var(--info);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Valor Pendente:</span>
+                    <span>Valores Pendentes:</span>
                     <strong id="valorPendentes" style="color: var(--warning);">R$ 0,00</strong>
                 </div>
                 <div class="status-summary-item">
-                    <span>Valor Não Realizado:</span>
+                    <span>Valores Não Realizados:</span>
                     <strong id="valorNaoInstalados" style="color: var(--danger);">R$ 0,00</strong>
                 </div>
             </div>
@@ -539,12 +539,12 @@
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" id="progressoBarra"></div>
                 </div>
-                <div class="progress-text" id="progressoTexto">Faltam R$ 35.000,00 em instalações para atingir a meta</div>
+                <div class="progress-text" id="progressoTexto">Faltam R$ 35.000,00 em instalações</div>
             </div>
 
             <div class="chart-container">
                 <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:3.3</div>
+                <div class="app-version-tag" id="appVersion">ver:3.4</div>
             </div>
         </div>
     </div>
@@ -630,10 +630,10 @@
     const form = document.getElementById('instalacaoForm');
     const tabelaContainer = document.getElementById('tabelaRegistros');
     
-    const VERSAO_SISTEMA = "ver:3.3";
+    const VERSAO_SISTEMA = "ver:3.4";
     let pizzaChart = null;
 
-    // Configuração de Comissão Única (2.0% e Meta de R$ 700,00 de comissão)
+    // Configuração de Comissão Fixa a 2.0% e Meta de R$ 700,00 de comissão
     const TAXA_COMISSAO_FIXA = 0.02;
     const META_COMISSAO_VALOR = 700.00;
     const META_VENDAS_BRUTAS = META_COMISSAO_VALOR / TAXA_COMISSAO_FIXA; // R$ 35.000,00 em vendas
@@ -925,9 +925,9 @@
         barraEl.style.width = pctMeta + '%';
 
         if (comissaoAtual >= META_COMISSAO_VALOR) {
-            textoEl.innerText = `🎉 Parabéns! Você superou a meta de R$ 700,00 de comissão!`;
+            textoEl.innerText = `🎉 Meta de R$ 700,00 de comissão atingida!`;
         } else {
-            textoEl.innerText = `Faltam ${formatarMoeda(vendasFaltantes)} em instalações para atingir R$ 700,00 de comissão`;
+            textoEl.innerText = `Faltam ${formatarMoeda(vendasFaltantes)} em instalações`;
         }
     }
 
