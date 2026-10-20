@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Instalações</title>
+    <title>Controle de OSs - Leroy Merlin</title>
     <meta name="theme-color" content="#183729">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Conexão ao Manifest local -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Ícones locais -->
     <link rel="apple-touch-icon" href="favicon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
     
@@ -20,8 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Excel & ChartJS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- ChartJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
@@ -45,7 +41,6 @@
             --border-color: #bcece4;
             --radius: 12px;
 
-            /* Cores muito claras para o fundo das linhas da tabela */
             --row-instalado-bg: #f0fdf4;
             --row-feito-bg: #f0f9ff;
             --row-pendente-bg: #fffbeb;
@@ -64,8 +59,87 @@
             background-color: var(--bg-color);
             padding: 16px 8px;
             color: var(--text-main);
+            min-height: 100vh;
         }
 
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- 1. SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 16px;
+        }
+
+        .splash-title {
+            color: #EBEBEB;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* --- 2. TELA DE LOGIN / CADASTRO --- */
+        #auth-container {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-card h2 {
+            color: var(--text-main);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group-auth {
+            margin-bottom: 16px;
+        }
+
+        .btn-group-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* --- 3. PAINEL PRINCIPAL --- */
         .container {
             max-width: 950px;
             margin: 0 auto;
@@ -302,14 +376,10 @@
         .btn-submit { background-color: var(--primary); color: white; width: 100%; }
         .btn-submit:hover { background-color: var(--primary-hover); }
 
-        .btn-excel { background-color: #059669; color: white; flex: 1; }
-        .btn-excel:hover { background-color: #047857; }
-
-        .btn-import { background-color: #0f3833; color: white; flex: 1; }
-        .btn-import:hover { background-color: #08211e; }
-
         .btn-secondary { background-color: #cdeee9; color: #0f3833; }
         .btn-secondary:hover { background-color: #b5e5dd; }
+
+        .btn-danger { background-color: #ef4444; color: white; margin-top: 10px; width: 100%; }
 
         .actions-bar {
             display: flex;
@@ -324,7 +394,6 @@
             min-width: 130px;
         }
 
-        /* Container Scrollável para a Tabela */
         .table-container {
             border-radius: var(--radius);
             border: 1px solid var(--border-color);
@@ -367,7 +436,6 @@
         th:nth-child(4), td:nth-child(4) { width: 21%; }
         th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
 
-        /* Estilização suave das linhas da tabela */
         tr.row-instalado td { background-color: var(--row-instalado-bg); }
         tr.row-feito td { background-color: var(--row-feito-bg); }
         tr.row-pendente td { background-color: var(--row-pendente-bg); }
@@ -390,7 +458,6 @@
             width: 100%;
         }
 
-        /* Badges de Status do Select */
         .status-instalado { background-color: var(--success-bg); color: #065f46; }
         .status-feito { background-color: var(--info-bg); color: #075985; }
         .status-nao-instalado { background-color: var(--danger-bg); color: #991b1b; }
@@ -413,63 +480,6 @@
             background-color: var(--input-bg);
         }
 
-        .commission-card {
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .commission-card h4 {
-            font-size: 0.8rem;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .commission-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px dashed var(--border-color);
-            margin-bottom: 8px;
-        }
-
-        .commission-val {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--success);
-        }
-
-        .commission-badge {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-
-        .progress-bar-bg {
-            background: rgba(0, 0, 0, 0.08);
-            border-radius: 8px;
-            height: 8px;
-            width: 100%;
-            overflow: hidden;
-            margin: 6px 0 4px 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .progress-bar-fill {
-            background: var(--primary);
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-
-        .progress-text {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
         tr.row-pressing {
             background-color: rgba(248, 113, 113, 0.3) !important;
             transition: background-color 0.8s ease;
@@ -478,692 +488,660 @@
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <button class="btn-logo-menu" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
-            <img src="favicon.png" alt="Logomarca">
-        </button>
-        <h1>Controle de Instalações</h1>
-    </header>
+    <!-- 1. SPLASH SCREEN -->
+    <div id="splash-screen">
+        <img src="favicon.png" alt="Leroy Merlin Logo" class="splash-logo">
+        <div class="splash-title">Acompanhamento de OSs</div>
+    </div>
 
-    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
-    <div class="menu-drawer" id="menuDrawer">
-        <div class="menu-header">
-            <h2>Informações</h2>
-            <button class="btn-close-menu" onclick="toggleMenu()">&times;</button>
-        </div>
-        <div class="menu-content">
-            <div class="menu-info-card">
-                <h4>📊 Resumo de Pendências</h4>
-                <div class="status-summary-item">
-                    <span>Instalações Feitas:</span>
-                    <strong id="qtdInstalados" style="color: var(--success);">0</strong>
-                </div>
-                <div class="status-summary-item">
-                    <span>Instalações Pendentes:</span>
-                    <strong id="qtdPendentes" style="color: var(--warning);">0</strong>
-                </div>
-                <div class="status-summary-item">
-                    <span>Instalações Não Feitas:</span>
-                    <strong id="qtdNaoInstalados" style="color: var(--danger);">0</strong>
-                </div>
+    <!-- 2. TELA DE LOGIN / CADASTRO -->
+    <div id="auth-container">
+        <div class="auth-card">
+            <h2>Acesso ao Sistema</h2>
+            
+            <div class="form-group-auth">
+                <label for="ldap">LDAP</label>
+                <input type="text" id="ldap" placeholder="Digite seu LDAP" required>
             </div>
 
-            <div class="menu-info-card">
-                <h4>💰 Valores Financeiros</h4>
-                <div class="status-summary-item">
-                    <span>Valores Faturados:</span>
-                    <strong id="valorInstalados" style="color: var(--success);">R$ 0,00</strong>
-                </div>
-                <div class="status-summary-item">
-                    <span>Valores a Faturar:</span>
-                    <strong id="valorFeito" style="color: var(--info);">R$ 0,00</strong>
-                </div>
-                <div class="status-summary-item">
-                    <span>Valores Pendentes:</span>
-                    <strong id="valorPendentes" style="color: var(--warning);">R$ 0,00</strong>
-                </div>
-                <div class="status-summary-item">
-                    <span>Valores Não Realizados:</span>
-                    <strong id="valorNaoInstalados" style="color: var(--danger);">R$ 0,00</strong>
-                </div>
+            <div class="form-group-auth">
+                <label for="matricula">Matrícula</label>
+                <input type="text" id="matricula" placeholder="Digite sua matrícula" required>
             </div>
 
-            <div class="commission-card">
-                <h4>🏷️ Sua comissão (2.0%):</h4>
-                <div class="commission-row">
-                    <span class="commission-badge" id="comissaoFaixa">Meta: R$ 700,00</span>
-                    <strong class="commission-val" id="comissaoValor">R$ 0,00</strong>
-                </div>
-                
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="progressoBarra"></div>
-                </div>
-                <div class="progress-text" id="progressoTexto">Faltam R$ 35.000,00 em instalações</div>
-            </div>
+            <div id="error-message" class="error-msg" style="display: none;"></div>
 
-            <div class="chart-container">
-                <canvas id="statusChart"></canvas>
-                <div class="app-version-tag" id="appVersion">ver:3.4</div>
+            <div class="btn-group-auth">
+                <button type="button" class="btn-submit" id="btn-login">Entrar</button>
+                <button type="button" class="btn-secondary" id="btn-cadastrar">Cadastrar Novo Usuário</button>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <form id="instalacaoForm">
-            <input type="hidden" id="editId">
-            <div class="form-grid-2x2">
-                <div class="field">
-                    <label for="dataInstalacao">Data da Instalação</label>
-                    <input type="date" id="dataInstalacao" required>
+    <!-- 3. PAINEL PRINCIPAL -->
+    <div id="app-container" class="container hidden">
+        <header>
+            <button class="btn-logo-menu" id="btnMenuToggle" onclick="toggleMenu()" aria-label="Abrir menu">
+                <img src="favicon.png" alt="Logomarca">
+            </button>
+            <h1>Controle de Instalações</h1>
+        </header>
+
+        <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+        <div class="menu-drawer" id="menuDrawer">
+            <div class="menu-header">
+                <h2>Informações</h2>
+                <button class="btn-close-menu" onclick="toggleMenu()">&times;</button>
+            </div>
+            <div class="menu-content">
+                <div class="menu-info-card">
+                    <h4>👤 Usuário Logado</h4>
+                    <div class="status-summary-item">
+                        <span>LDAP:</span>
+                        <strong id="displayLdap">-</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Matrícula:</span>
+                        <strong id="displayMatricula">-</strong>
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="numeroPedido">Nº do Pedido</label>
-                    <input type="text" id="numeroPedido" placeholder="Ex: 37258326" required>
+
+                <div class="menu-info-card">
+                    <h4>📊 Resumo de Pendências</h4>
+                    <div class="status-summary-item">
+                        <span>Instalações Feitas:</span>
+                        <strong id="qtdInstalados" style="color: var(--success);">0</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Instalações Pendentes:</span>
+                        <strong id="qtdPendentes" style="color: var(--warning);">0</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Instalações Não Feitas:</span>
+                        <strong id="qtdNaoInstalados" style="color: var(--danger);">0</strong>
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="valor">Valor (R$)</label>
-                    <input type="number" id="valor" step="0.01" placeholder="0,00" required>
+
+                <div class="menu-info-card">
+                    <h4>💰 Valores Financeiros</h4>
+                    <div class="status-summary-item">
+                        <span>Valores Faturados:</span>
+                        <strong id="valorInstalados" style="color: var(--success);">R$ 0,00</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Valores a Faturar:</span>
+                        <strong id="valorFeito" style="color: var(--info);">R$ 0,00</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Valores Pendentes:</span>
+                        <strong id="valorPendentes" style="color: var(--warning);">R$ 0,00</strong>
+                    </div>
+                    <div class="status-summary-item">
+                        <span>Valores Não Realizados:</span>
+                        <strong id="valorNaoInstalados" style="color: var(--danger);">R$ 0,00</strong>
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="status">Status</label>
-                    <select id="status" required>
-                        <option value="Pendente">Pendente</option>
-                        <option value="Instalado">Instalado</option>
-                        <option value="Feito">Feito</option>
-                        <option value="Não Instalado">Não Instalado</option>
-                        <option value="Eliminado">Eliminado</option>
-                        <option value="Cancelado">Cancelado</option>
-                    </select>
+
+                <button type="button" class="btn-danger" id="btnSair">Sair da Conta</button>
+
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                    <div class="app-version-tag" id="appVersion">ver:5.3 (Realtime Pedido Key)</div>
                 </div>
             </div>
-            <div class="btn-group">
-                <button type="submit" class="btn-submit" id="btnSubmit">Cadastrar Registro</button>
-                <button type="button" class="btn-secondary" id="btnCancelEdit" style="display:none;" onclick="cancelarEdicao()">Cancelar</button>
-            </div>
-        </form>
+        </div>
+
+        <div class="card">
+            <form id="instalacaoForm">
+                <input type="hidden" id="editKey">
+                <div class="form-grid-2x2">
+                    <div class="field">
+                        <label for="dataInstalacao">Data da Instalação</label>
+                        <input type="date" id="dataInstalacao" required>
+                    </div>
+                    <div class="field">
+                        <label for="numeroPedido">Nº do Pedido</label>
+                        <input type="text" id="numeroPedido" placeholder="Ex: 37258326" required>
+                    </div>
+                    <div class="field">
+                        <label for="valor">Valor (R$)</label>
+                        <input type="number" id="valor" step="0.01" placeholder="0,00" required>
+                    </div>
+                    <div class="field">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Instalado">Instalado</option>
+                            <option value="Feito">Feito</option>
+                            <option value="Não Instalado">Não Instalado</option>
+                            <option value="Eliminado">Eliminado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn-submit" id="btnSubmit">Cadastrar Registro</button>
+                    <button type="button" class="btn-secondary" id="btnCancelEdit" style="display:none;" onclick="cancelarEdicao()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="actions-bar">
+            <select id="ordemSelect" class="order-select">
+                <option value="data">Ordem: Data</option>
+                <option value="pedido">Ordem: Pedido</option>
+            </select>
+            
+            <select id="filtroSelect" class="filter-select">
+                <option value="Todos">Filtro: Todos</option>
+                <option value="Instalado">Instalados / Feitos</option>
+                <option value="Pendente">Pendentes</option>
+                <option value="NaoRealizados">Cancelados / Eliminados / Não Instalados</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Pedido</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaRegistros"></tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="actions-bar">
-        <select id="ordemSelect" class="order-select" onchange="carregarRegistros()">
-            <option value="data">Ordem: Data</option>
-            <option value="pedido">Ordem: Pedido</option>
-        </select>
-        
-        <select id="filtroSelect" class="filter-select" onchange="carregarRegistros()">
-            <option value="Todos">Filtro: Todos</option>
-            <option value="Instalado">Instalados / Feitos</option>
-            <option value="Pendente">Pendentes</option>
-            <option value="NaoRealizados">Cancelados / Eliminados / Não Instalados</option>
-        </select>
+    <!-- MÓDULO JS COM REALTIME DATABASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get, 
+            update, 
+            remove, 
+            onValue, 
+            off 
+        } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-        <button type="button" class="btn-excel" onclick="exportarParaExcel()">📊 Exportar</button>
-        <button type="button" class="btn-import" onclick="document.getElementById('fileInput').click()">📥 Importar</button>
-        <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="importarDoExcel(event)">
-    </div>
-
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Pedido</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaRegistros"></tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker Registrado!', reg))
-                .catch(err => console.error('Erro no Service Worker:', err));
-        });
-    }
-
-    const form = document.getElementById('instalacaoForm');
-    const tabelaContainer = document.getElementById('tabelaRegistros');
-    
-    const VERSAO_SISTEMA = "ver:3.4";
-    let pizzaChart = null;
-
-    // Configuração de Comissão Fixa a 2.0% e Meta de R$ 700,00 de comissão
-    const TAXA_COMISSAO_FIXA = 0.02;
-    const META_COMISSAO_VALOR = 700.00;
-    const META_VENDAS_BRUTAS = META_COMISSAO_VALOR / TAXA_COMISSAO_FIXA; // R$ 35.000,00 em vendas
-
-    document.addEventListener('DOMContentLoaded', () => {
-        inicializarGrafico();
-        carregarRegistros();
-    });
-
-    function toggleMenu() {
-        document.getElementById('menuDrawer').classList.toggle('active');
-        document.getElementById('menuOverlay').classList.toggle('active');
-    }
-
-    function atualizarDisplayVersao() {
-        const versionEl = document.getElementById('appVersion');
-        if (versionEl) {
-            versionEl.innerText = VERSAO_SISTEMA;
-        }
-    }
-
-    function obterDataHoraAtual() {
-        const agora = new Date();
-        const dia = String(agora.getDate()).padStart(2, '0');
-        const mes = String(agora.getMonth() + 1).padStart(2, '0');
-        const ano = agora.getFullYear();
-        const hora = String(agora.getHours()).padStart(2, '0');
-        const min = String(agora.getMinutes()).padStart(2, '0');
-        return `${dia}/${mes}/${ano} ${hora}:${min}`;
-    }
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const editId = document.getElementById('editId').value;
-        const registroData = {
-            data: document.getElementById('dataInstalacao').value,
-            pedido: document.getElementById('numeroPedido').value.trim(),
-            valor: parseFloat(document.getElementById('valor').value) || 0,
-            status: document.getElementById('status').value
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0UGiSxuAgjjQaSh8TmST8-A5aMmQqdaY",
+            authDomain: "leroy-app.firebaseapp.com",
+            databaseURL: "https://leroy-app-default-rtdb.firebaseio.com",
+            projectId: "leroy-app",
+            storageBucket: "leroy-app.firebasestorage.app",
+            messagingSenderId: "535866300891",
+            appId: "1:535866300891:web:b8444f7a2acedca8b62ffe"
         };
 
-        if (editId) {
-            atualizarRegistroExistente(Number(editId), registroData);
-        } else {
-            salvarRegistro({ 
-                id: Date.now(), 
-                ...registroData,
-                dataCriacao: obterDataHoraAtual()
-            });
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let usuarioLogado = JSON.parse(localStorage.getItem('usuario_logado')) || null;
+        let registrosFirebase = [];
+        let pizzaChart = null;
+
+        const splashScreen = document.getElementById('splash-screen');
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const errorMsg = document.getElementById('error-message');
+        const form = document.getElementById('instalacaoForm');
+        const tabelaContainer = document.getElementById('tabelaRegistros');
+
+        function obterDataHoraAparelho() {
+            return new Date().toLocaleString('pt-BR');
         }
 
-        cancelarEdicao();
-        carregarRegistros();
-    });
-
-    function obterRegistros() {
-        try {
-            return JSON.parse(localStorage.getItem('registros_instalacao')) || [];
-        } catch (e) {
-            return [];
-        }
-    }
-
-    function salvarRegistro(registro) {
-        const registros = obterRegistros();
-        registros.push(registro);
-        localStorage.setItem('registros_instalacao', JSON.stringify(registros));
-    }
-
-    function atualizarRegistroExistente(id, dadosNovos) {
-        let registros = obterRegistros();
-        const index = registros.findIndex(r => String(r.id) === String(id));
-        if (index !== -1) {
-            registros[index] = { 
-                ...registros[index], 
-                ...dadosNovos 
-            };
-            localStorage.setItem('registros_instalacao', JSON.stringify(registros));
-        }
-    }
-
-    function atualizarStatus(id, novoStatus) {
-        let registros = obterRegistros();
-        const registro = registros.find(r => String(r.id) === String(id));
-        if (registro) {
-            registro.status = novoStatus;
-            localStorage.setItem('registros_instalacao', JSON.stringify(registros));
-            carregarRegistros();
-        }
-    }
-
-    function editarRegistro(id) {
-        const registros = obterRegistros();
-        const reg = registros.find(r => String(r.id) === String(id));
-        if (!reg) return;
-
-        document.getElementById('editId').value = reg.id;
-        document.getElementById('dataInstalacao').value = reg.data;
-        document.getElementById('numeroPedido').value = reg.pedido;
-        document.getElementById('valor').value = reg.valor;
-        document.getElementById('status').value = reg.status;
-
-        document.getElementById('btnSubmit').innerText = 'Salvar Alterações';
-        document.getElementById('btnCancelEdit').style.display = 'inline-flex';
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deletarRegistro(idTarget) {
-        let registros = obterRegistros();
-        const regAlvo = registros.find(r => String(r.id) === String(idTarget));
-        
-        if (!regAlvo) return;
-
-        if (confirm(`Deseja apagar o registro do pedido #${regAlvo.pedido}?`)) {
-            const novosRegistros = registros.filter(r => String(r.id) !== String(idTarget));
-            localStorage.setItem('registros_instalacao', JSON.stringify(novosRegistros));
-            carregarRegistros();
-        }
-    }
-
-    function cancelarEdicao() {
-        form.reset();
-        document.getElementById('editId').value = '';
-        document.getElementById('btnSubmit').innerText = 'Cadastrar Registro';
-        document.getElementById('btnCancelEdit').style.display = 'none';
-    }
-
-    function abrirLinkPedido(numPedido) {
-        const apenasNumeros = String(numPedido).replace(/\D/g, '');
-        let pedidoFormatado = apenasNumeros;
-        if (!pedidoFormatado.startsWith('00')) {
-            pedidoFormatado = '00' + pedidoFormatado;
-        }
-        const url = `https://va.leroymerlin.com.br/va/checkout/lm/viewCart?cartNumber=${pedidoFormatado}`;
-        window.open(url, '_blank');
-    }
-
-    function formatarData(dataISO) {
-        if (!dataISO || typeof dataISO !== 'string') return '';
-        const partes = dataISO.split('-');
-        if (partes.length !== 3) return dataISO;
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-
-    function converterDataParaISO(val) {
-        if (!val) return '';
-
-        if (typeof val === 'number') {
-            try {
-                const dateObj = XLSX.SSF.parse_date_code(val);
-                if (dateObj) {
-                    return `${dateObj.y}-${String(dateObj.m).padStart(2, '0')}-${String(dateObj.d).padStart(2, '0')}`;
-                }
-            } catch (err) {
-                return '';
-            }
-        }
-
-        const str = String(val).trim();
-        if (str.includes('-')) {
-            const p = str.split('-');
-            if (p[0].length === 4) return str;
-            if (p[2].length === 4) return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
-        }
-        if (str.includes('/')) {
-            const p = str.split('/');
-            if (p.length === 3) {
-                const ano = p[2].length === 2 ? '20' + p[2] : p[2];
-                return `${ano}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
-            }
-        }
-        return '';
-    }
-
-    function parseValorNumerico(val) {
-        if (typeof val === 'number') return val;
-        if (!val) return 0;
-        let str = String(val).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim();
-        let num = parseFloat(str);
-        return isNaN(num) ? 0 : num;
-    }
-
-    function formatarMoeda(valor) {
-        return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    function obterClasseStatus(status) {
-        switch (status) {
-            case 'Instalado': return 'status-instalado';
-            case 'Feito': return 'status-feito';
-            case 'Não Instalado': 
-            case 'Eliminado': 
-            case 'Cancelado': 
-                return 'status-nao-instalado';
-            case 'Pendente': return 'status-pendente';
-            default: return '';
-        }
-    }
-
-    function obterClasseLinha(status) {
-        switch (status) {
-            case 'Instalado': return 'row-instalado';
-            case 'Feito': return 'row-feito';
-            case 'Não Instalado': 
-            case 'Eliminado': 
-            case 'Cancelado': 
-                return 'row-nao-instalado';
-            case 'Pendente': return 'row-pendente';
-            default: return '';
-        }
-    }
-
-    function ordenarRegistros(registros) {
-        const tipoOrdem = document.getElementById('ordemSelect').value;
-
-        return [...registros].sort((a, b) => {
-            const valA = a[tipoOrdem] || '';
-            const valB = b[tipoOrdem] || '';
-
-            if (tipoOrdem === 'data') {
-                return valA.localeCompare(valB);
-            } else if (tipoOrdem === 'pedido') {
-                return valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' });
-            }
-            return 0;
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                splashScreen.classList.add('hidden');
+                verificarSessao();
+            }, 2500);
         });
-    }
 
-    function filtrarRegistros(registros) {
-        const filtro = document.getElementById('filtroSelect').value;
-
-        if (filtro === 'Todos') return registros;
-        if (filtro === 'Instalado') return registros.filter(r => r.status === 'Instalado' || r.status === 'Feito');
-        if (filtro === 'Pendente') return registros.filter(r => r.status === 'Pendente');
-        if (filtro === 'NaoRealizados') {
-            return registros.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
+        function verificarSessao() {
+            if (usuarioLogado && usuarioLogado.ldap) {
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                document.getElementById('displayLdap').innerText = usuarioLogado.ldap || '-';
+                document.getElementById('displayMatricula').innerText = usuarioLogado.matricula || '-';
+                inicializarGrafico();
+                iniciarOuvinteRealtime();
+            } else {
+                appContainer.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+            }
         }
-        return registros;
-    }
 
-    function inicializarGrafico() {
-        const ctx = document.getElementById('statusChart').getContext('2d');
+        function exibirErro(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = 'block';
+        }
 
-        pizzaChart = new Chart(ctx, {
-            type: 'pie',
-            plugins: [ChartDataLabels],
-            data: {
-                labels: ['Feitas/Instaladas', 'Pendentes', 'Não Feitas'],
-                datasets: [{
-                    data: [0, 0, 0],
-                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                    borderWidth: 1,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: true },
-                    datalabels: {
-                        color: '#ffffff',
-                        font: { weight: 'bold', size: 11 },
-                        formatter: (value, ctx) => {
-                            let dataArr = ctx.chart.data.datasets[0].data;
-                            let sum = dataArr.reduce((acc, curr) => acc + curr, 0);
-                            if (sum === 0 || value === 0) return '';
-                            return (value * 100 / sum).toFixed(0) + '%';
+        function limparErro() {
+            errorMsg.innerText = '';
+            errorMsg.style.display = 'none';
+        }
+
+        // --- CADASTRO ---
+        document.getElementById('btn-cadastrar').addEventListener('click', async () => {
+            limparErro();
+            const ldap = document.getElementById('ldap').value.trim().toLowerCase();
+            const matricula = document.getElementById('matricula').value.trim();
+
+            if (!ldap || !matricula) {
+                exibirErro('Preencha o LDAP e a Matrícula.');
+                return;
+            }
+
+            try {
+                const userRef = ref(db, `usuarios/${ldap}`);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    exibirErro(`O LDAP "${ldap}" já está cadastrado.`);
+                    return;
+                }
+
+                const allUsersRef = ref(db, 'usuarios');
+                const allUsersSnap = await get(allUsersRef);
+                if (allUsersSnap.exists()) {
+                    const users = allUsersSnap.val();
+                    for (let keyLdap in users) {
+                        if (users[keyLdap].matricula === matricula) {
+                            exibirErro(`A Matrícula "${matricula}" já está em uso por outro usuário.`);
+                            return;
                         }
                     }
                 }
-            }
-        });
-    }
 
-    function calcularComissao(valorVendasAcumulado) {
-        const comissaoAtual = valorVendasAcumulado * TAXA_COMISSAO_FIXA;
-        const vendasFaltantes = Math.max(0, META_VENDAS_BRUTAS - valorVendasAcumulado);
-        const pctMeta = Math.min(100, (comissaoAtual / META_COMISSAO_VALOR) * 100);
-
-        document.getElementById('comissaoValor').innerText = formatarMoeda(comissaoAtual);
-        
-        const barraEl = document.getElementById('progressoBarra');
-        const textoEl = document.getElementById('progressoTexto');
-
-        barraEl.style.width = pctMeta + '%';
-
-        if (comissaoAtual >= META_COMISSAO_VALOR) {
-            textoEl.innerText = `🎉 Meta de R$ 700,00 de comissão atingida!`;
-        } else {
-            textoEl.innerText = `Faltam ${formatarMoeda(vendasFaltantes)} em instalações`;
-        }
-    }
-
-    function atualizarTotais(registrosExibidos) {
-        const instalados = registrosExibidos.filter(r => r.status === 'Instalado');
-        const feitos = registrosExibidos.filter(r => r.status === 'Feito');
-        const pendentes = registrosExibidos.filter(r => r.status === 'Pendente');
-        const naoInstalados = registrosExibidos.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
-
-        const somaInstalados = instalados.reduce((acc, r) => acc + (r.valor || 0), 0);
-        const somaFeitos = feitos.reduce((acc, r) => acc + (r.valor || 0), 0);
-        const somaPendentes = pendentes.reduce((acc, r) => acc + (r.valor || 0), 0);
-        const somaNaoInstalados = naoInstalados.reduce((acc, r) => acc + (r.valor || 0), 0);
-
-        document.getElementById('qtdInstalados').innerText = instalados.length + feitos.length;
-        document.getElementById('qtdPendentes').innerText = pendentes.length;
-        document.getElementById('qtdNaoInstalados').innerText = naoInstalados.length;
-
-        document.getElementById('valorInstalados').innerText = formatarMoeda(somaInstalados);
-        document.getElementById('valorFeito').innerText = formatarMoeda(somaFeitos);
-        document.getElementById('valorPendentes').innerText = formatarMoeda(somaPendentes);
-        document.getElementById('valorNaoInstalados').innerText = formatarMoeda(somaNaoInstalados);
-
-        if (pizzaChart) {
-            pizzaChart.data.datasets[0].data = [instalados.length + feitos.length, pendentes.length, naoInstalados.length];
-            pizzaChart.update();
-        }
-
-        // Comissão calculada a 2% sobre Instalados + Feitos
-        calcularComissao(somaInstalados + somaFeitos);
-    }
-
-    function carregarRegistros() {
-        const todosRegistros = obterRegistros();
-        
-        atualizarTotais(todosRegistros);
-        atualizarDisplayVersao();
-
-        const registrosOrdenados = ordenarRegistros(todosRegistros);
-        const registrosFiltrados = filtrarRegistros(registrosOrdenados);
-
-        tabelaContainer.innerHTML = '';
-
-        if (registrosFiltrados.length === 0) {
-            tabelaContainer.innerHTML = `<tr><td colspan="5" class="empty-msg">Nenhum registro encontrado para este filtro.</td></tr>`;
-            return;
-        }
-
-        registrosFiltrados.forEach(r => {
-            const tr = document.createElement('tr');
-            tr.dataset.id = r.id;
-            tr.className = obterClasseLinha(r.status);
-
-            tr.innerHTML = `
-                <td>${formatarData(r.data)}</td>
-                <td>
-                    <span class="pedido-link" onclick="abrirLinkPedido('${r.pedido}')">
-                        ${r.pedido}
-                    </span>
-                </td>
-                <td>${formatarMoeda(r.valor)}</td>
-                <td>
-                    <select class="status-select ${obterClasseStatus(r.status)}">
-                        <option value="Pendente" ${r.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                        <option value="Instalado" ${r.status === 'Instalado' ? 'selected' : ''}>Instalado</option>
-                        <option value="Feito" ${r.status === 'Feito' ? 'selected' : ''}>Feito</option>
-                        <option value="Não Instalado" ${r.status === 'Não Instalado' ? 'selected' : ''}>Não Instalado</option>
-                        <option value="Eliminado" ${r.status === 'Eliminado' ? 'selected' : ''}>Eliminado</option>
-                        <option value="Cancelado" ${r.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
-                    </select>
-                </td>
-                <td style="text-align: center;">
-                    <button type="button" class="btn-edit">Editar</button>
-                </td>
-            `;
-
-            const selectStatus = tr.querySelector('.status-select');
-            selectStatus.addEventListener('change', (e) => {
-                e.stopPropagation();
-                atualizarStatus(tr.dataset.id, e.target.value);
-            });
-
-            const btnEdit = tr.querySelector('.btn-edit');
-            btnEdit.addEventListener('click', (e) => {
-                e.stopPropagation();
-                editarRegistro(tr.dataset.id);
-            });
-
-            let timerSegurar = null;
-            const iniciarPressionamento = (e) => { 
-                if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
-                tr.classList.add('row-pressing'); 
-                const targetId = tr.dataset.id;
-                timerSegurar = setTimeout(() => deletarRegistro(targetId), 900); 
-            };
-            const cancelarPressionamento = () => { 
-                tr.classList.remove('row-pressing'); 
-                if (timerSegurar) clearTimeout(timerSegurar); 
-            };
-
-            tr.addEventListener('touchstart', iniciarPressionamento, { passive: true });
-            tr.addEventListener('touchend', cancelarPressionamento);
-            tr.addEventListener('touchmove', cancelarPressionamento);
-            tr.addEventListener('mousedown', iniciarPressionamento);
-            tr.addEventListener('mouseup', cancelarPressionamento);
-            tr.addEventListener('mouseleave', cancelarPressionamento);
-
-            tabelaContainer.appendChild(tr);
-        });
-    }
-
-    function exportarParaExcel() {
-        const registros = ordenarRegistros(obterRegistros());
-
-        if (registros.length === 0) {
-            alert('Não há registros para exportar!');
-            return;
-        }
-
-        const dadosExcel = registros.map(r => ({
-            'Data da Instalação': formatarData(r.data),
-            'Número do Pedido': r.pedido,
-            'Valor (R$)': r.valor,
-            'Status': r.status,
-            'Data de Criação': r.dataCriacao || 'N/A'
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Instalações");
-
-        worksheet['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 20 }];
-
-        XLSX.writeFile(workbook, "Relatorio_Instalacoes.xlsx");
-    }
-
-    function importarDoExcel(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (!confirm('Atenção: A importação irá substituir todos os registros atuais. Deseja continuar?')) {
-            e.target.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array', cellDates: false });
-                
-                if (!workbook.SheetNames.length) {
-                    alert('Nenhuma aba encontrada na planilha.');
-                    e.target.value = '';
-                    return;
-                }
-
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonDados = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: '' });
-
-                if (jsonDados.length === 0) {
-                    alert('Nenhum dado encontrado na planilha.');
-                    e.target.value = '';
-                    return;
-                }
-
-                const novosRegistros = [];
-                const dataHoraImportacao = obterDataHoraAtual();
-
-                jsonDados.forEach((row, index) => {
-                    const keys = Object.keys(row);
-                    const chaveData = keys.find(k => /data/i.test(k) && !/criação|criacao/i.test(k));
-                    const chavePedido = keys.find(k => /pedido|numero|num/i.test(k));
-                    const chaveValor = keys.find(k => /valor|preço|preco/i.test(k));
-                    const chaveStatus = keys.find(k => /status|situacao|situação/i.test(k));
-                    const chaveCriacao = keys.find(k => /criação|criacao/i.test(k));
-
-                    const valData = chaveData ? row[chaveData] : '';
-                    const valPedido = chavePedido ? row[chavePedido] : '';
-                    const valValor = chaveValor ? row[chaveValor] : 0;
-                    const valStatus = chaveStatus ? row[chaveStatus] : '';
-                    const valCriacao = chaveCriacao ? row[chaveCriacao] : '';
-
-                    const dataIso = converterDataParaISO(valData);
-                    const pedido = String(valPedido || `IMP-${index + 1}`).trim();
-                    const valor = parseValorNumerico(valValor);
-                    
-                    let status = String(valStatus).trim();
-                    if (/instalado/i.test(status) && !/não|nao/i.test(status)) {
-                        status = 'Instalado';
-                    } else if (/feito/i.test(status)) {
-                        status = 'Feito';
-                    } else if (/eliminado/i.test(status)) {
-                        status = 'Eliminado';
-                    } else if (/cancelado/i.test(status)) {
-                        status = 'Cancelado';
-                    } else if (/não|nao/i.test(status)) {
-                        status = 'Não Instalado';
-                    } else {
-                        status = 'Pendente';
-                    }
-
-                    if (pedido) {
-                        novosRegistros.push({
-                            id: Number(`${Date.now()}${index}${Math.floor(Math.random() * 1000)}`),
-                            data: dataIso || new Date().toISOString().slice(0, 10),
-                            pedido: pedido,
-                            valor: valor,
-                            status: status,
-                            dataCriacao: valCriacao || dataHoraImportacao
-                        });
-                    }
+                await set(userRef, {
+                    matricula: matricula,
+                    criadoEm: obterDataHoraAparelho()
                 });
 
-                if (novosRegistros.length > 0) {
-                    localStorage.setItem('registros_instalacao', JSON.stringify(novosRegistros));
-                    carregarRegistros();
-                    alert(`${novosRegistros.length} registros importados com sucesso!`);
-                } else {
-                    alert('Não foi possível identificar colunas válidas no arquivo.');
-                }
+                usuarioLogado = { ldap: ldap, matricula: matricula };
+                localStorage.setItem('usuario_logado', JSON.stringify(usuarioLogado));
+                verificarSessao();
+
             } catch (err) {
-                alert('Erro ao processar o arquivo Excel: ' + err.message);
-            } finally {
-                e.target.value = '';
+                exibirErro('Erro ao cadastrar: ' + err.message);
             }
+        });
+
+        // --- LOGIN ---
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            limparErro();
+            const ldap = document.getElementById('ldap').value.trim().toLowerCase();
+            const matricula = document.getElementById('matricula').value.trim();
+
+            if (!ldap || !matricula) {
+                exibirErro('Informe o LDAP e a Matrícula para entrar.');
+                return;
+            }
+
+            try {
+                const userRef = ref(db, `usuarios/${ldap}`);
+                const snapshot = await get(userRef);
+
+                if (!snapshot.exists()) {
+                    exibirErro(`LDAP "${ldap}" não encontrado.`);
+                    return;
+                }
+
+                const userData = snapshot.val();
+                if (userData.matricula !== matricula) {
+                    exibirErro('Matrícula incorreta para este LDAP.');
+                    return;
+                }
+
+                usuarioLogado = { ldap: ldap, matricula: matricula };
+                localStorage.setItem('usuario_logado', JSON.stringify(usuarioLogado));
+                verificarSessao();
+
+            } catch (err) {
+                exibirErro('Erro ao entrar: ' + err.message);
+            }
+        });
+
+        // --- LOGOUT ---
+        document.getElementById('btnSair').addEventListener('click', () => {
+            if (usuarioLogado && usuarioLogado.ldap) {
+                off(ref(db, `instalacoes/${usuarioLogado.ldap}`));
+            }
+            localStorage.removeItem('usuario_logado');
+            usuarioLogado = null;
+            verificarSessao();
+        });
+
+        window.toggleMenu = function() {
+            document.getElementById('menuDrawer').classList.toggle('active');
+            document.getElementById('menuOverlay').classList.toggle('active');
         };
 
-        reader.onerror = function() {
-            alert('Falha ao ler o arquivo selecionado.');
-            e.target.value = '';
+        window.cancelarEdicao = function() {
+            form.reset();
+            document.getElementById('editKey').value = '';
+            document.getElementById('numeroPedido').disabled = false;
+            document.getElementById('btnSubmit').innerText = 'Cadastrar Registro';
+            document.getElementById('btnCancelEdit').style.display = 'none';
         };
 
-        reader.readAsArrayBuffer(file);
-    }
-</script>
+        // --- OUVINTE REALTIME DA COLEÇÃO DE INSTALAÇÕES ---
+        function iniciarOuvinteRealtime() {
+            if (!usuarioLogado || !usuarioLogado.ldap) return;
+
+            const userInstalacoesRef = ref(db, `instalacoes/${usuarioLogado.ldap}`);
+
+            onValue(userInstalacoesRef, (snapshot) => {
+                registrosFirebase = [];
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    for (let pedidoKey in data) {
+                        registrosFirebase.push({
+                            key: pedidoKey,
+                            ...data[pedidoKey]
+                        });
+                    }
+                }
+                carregarRegistros();
+            });
+        }
+
+        // --- SALVAR / EDITAR REGISTRO ---
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const editKey = document.getElementById('editKey').value;
+            const numeroPedido = document.getElementById('numeroPedido').value.trim();
+            const dataHoraAtual = obterDataHoraAparelho();
+
+            if (!numeroPedido) {
+                alert("Por favor, digite o número do pedido.");
+                return;
+            }
+
+            const osRef = ref(db, `instalacoes/${usuarioLogado.ldap}/${numeroPedido}`);
+
+            try {
+                if (editKey) {
+                    await update(osRef, {
+                        data: document.getElementById('dataInstalacao').value,
+                        pedido: numeroPedido,
+                        valor: parseFloat(document.getElementById('valor').value) || 0,
+                        status: document.getElementById('status').value,
+                        atualizadoEm: dataHoraAtual
+                    });
+                } else {
+                    const checkSnap = await get(osRef);
+                    if (checkSnap.exists()) {
+                        alert(`O pedido #${numeroPedido} já está cadastrado. Edite-o na lista abaixo.`);
+                        return;
+                    }
+
+                    await set(osRef, {
+                        data: document.getElementById('dataInstalacao').value,
+                        pedido: numeroPedido,
+                        valor: parseFloat(document.getElementById('valor').value) || 0,
+                        status: document.getElementById('status').value,
+                        dataCriacao: dataHoraAtual,
+                        atualizadoEm: dataHoraAtual
+                    });
+                }
+                cancelarEdicao();
+            } catch (err) {
+                alert("Erro ao salvar no Realtime Database: " + err.message);
+            }
+        });
+
+        async function atualizarStatus(pedidoKey, novoStatus) {
+            try {
+                await update(ref(db, `instalacoes/${usuarioLogado.ldap}/${pedidoKey}`), { 
+                    status: novoStatus,
+                    atualizadoEm: obterDataHoraAparelho()
+                });
+            } catch (err) {
+                alert("Erro ao atualizar status: " + err.message);
+            }
+        }
+
+        async function deletarRegistro(pedidoKey) {
+            if (confirm(`Deseja apagar o registro do pedido #${pedidoKey}?`)) {
+                try {
+                    await remove(ref(db, `instalacoes/${usuarioLogado.ldap}/${pedidoKey}`));
+                } catch (err) {
+                    alert("Erro ao remover registro: " + err.message);
+                }
+            }
+        }
+
+        function editarRegistro(pedidoKey) {
+            const reg = registrosFirebase.find(r => r.key === pedidoKey);
+            if (!reg) return;
+
+            document.getElementById('editKey').value = reg.key;
+            document.getElementById('dataInstalacao').value = reg.data;
+            document.getElementById('numeroPedido').value = reg.pedido;
+            document.getElementById('numeroPedido').disabled = true;
+            document.getElementById('valor').value = reg.valor;
+            document.getElementById('status').value = reg.status;
+
+            document.getElementById('btnSubmit').innerText = 'Salvar Alterações';
+            document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function formatarData(dataISO) {
+            if (!dataISO || typeof dataISO !== 'string') return '';
+            const partes = dataISO.split('-');
+            if (partes.length !== 3) return dataISO;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        function formatarMoeda(valor) {
+            return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function obterClasseStatus(status) {
+            switch (status) {
+                case 'Instalado': return 'status-instalado';
+                case 'Feito': return 'status-feito';
+                case 'Não Instalado': 
+                case 'Eliminado': 
+                case 'Cancelado': 
+                    return 'status-nao-instalado';
+                case 'Pendente': return 'status-pendente';
+                default: return '';
+            }
+        }
+
+        function obterClasseLinha(status) {
+            switch (status) {
+                case 'Instalado': return 'row-instalado';
+                case 'Feito': return 'row-feito';
+                case 'Não Instalado': 
+                case 'Eliminado': 
+                case 'Cancelado': 
+                    return 'row-nao-instalado';
+                case 'Pendente': return 'row-pendente';
+                default: return '';
+            }
+        }
+
+        function ordenarRegistros(registros) {
+            const tipoOrdem = document.getElementById('ordemSelect').value;
+
+            return [...registros].sort((a, b) => {
+                const valA = a[tipoOrdem] || '';
+                const valB = b[tipoOrdem] || '';
+
+                if (tipoOrdem === 'data') {
+                    return valA.localeCompare(valB);
+                } else if (tipoOrdem === 'pedido') {
+                    return valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' });
+                }
+                return 0;
+            });
+        }
+
+        function filtrarRegistros(registros) {
+            const filtro = document.getElementById('filtroSelect').value;
+
+            if (filtro === 'Todos') return registros;
+            if (filtro === 'Instalado') return registros.filter(r => r.status === 'Instalado' || r.status === 'Feito');
+            if (filtro === 'Pendente') return registros.filter(r => r.status === 'Pendente');
+            if (filtro === 'NaoRealizados') {
+                return registros.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
+            }
+            return registros;
+        }
+
+        function inicializarGrafico() {
+            if (pizzaChart) return;
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            pizzaChart = new Chart(ctx, {
+                type: 'pie',
+                plugins: [ChartDataLabels],
+                data: {
+                    labels: ['Feitas/Instaladas', 'Pendentes', 'Não Feitas'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 1,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (value, ctx) => {
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                let sum = dataArr.reduce((acc, curr) => acc + curr, 0);
+                                if (sum === 0 || value === 0) return '';
+                                return (value * 100 / sum).toFixed(0) + '%';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function atualizarTotais(registrosExibidos) {
+            const instalados = registrosExibidos.filter(r => r.status === 'Instalado');
+            const feitos = registrosExibidos.filter(r => r.status === 'Feito');
+            const pendentes = registrosExibidos.filter(r => r.status === 'Pendente');
+            const naoInstalados = registrosExibidos.filter(r => r.status === 'Não Instalado' || r.status === 'Eliminado' || r.status === 'Cancelado');
+
+            const somaInstalados = instalados.reduce((acc, r) => acc + (r.valor || 0), 0);
+            const somaFeitos = feitos.reduce((acc, r) => acc + (r.valor || 0), 0);
+            const somaPendentes = pendentes.reduce((acc, r) => acc + (r.valor || 0), 0);
+            const somaNaoInstalados = naoInstalados.reduce((acc, r) => acc + (r.valor || 0), 0);
+
+            document.getElementById('qtdInstalados').innerText = instalados.length + feitos.length;
+            document.getElementById('qtdPendentes').innerText = pendentes.length;
+            document.getElementById('qtdNaoInstalados').innerText = naoInstalados.length;
+
+            document.getElementById('valorInstalados').innerText = formatarMoeda(somaInstalados);
+            document.getElementById('valorFeito').innerText = formatarMoeda(somaFeitos);
+            document.getElementById('valorPendentes').innerText = formatarMoeda(somaPendentes);
+            document.getElementById('valorNaoInstalados').innerText = formatarMoeda(somaNaoInstalados);
+
+            if (pizzaChart) {
+                pizzaChart.data.datasets[0].data = [instalados.length + feitos.length, pendentes.length, naoInstalados.length];
+                pizzaChart.update();
+            }
+        }
+
+        function carregarRegistros() {
+            atualizarTotais(registrosFirebase);
+
+            const registrosOrdenados = ordenarRegistros(registrosFirebase);
+            const registrosFiltrados = filtrarRegistros(registrosOrdenados);
+
+            tabelaContainer.innerHTML = '';
+
+            if (registrosFiltrados.length === 0) {
+                tabelaContainer.innerHTML = `<tr><td colspan="5" class="empty-msg">Nenhum registro encontrado no Realtime Database.</td></tr>`;
+                return;
+            }
+
+            registrosFiltrados.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = r.key;
+                tr.className = obterClasseLinha(r.status);
+
+                tr.innerHTML = `
+                    <td>${formatarData(r.data)}</td>
+                    <td>
+                        <span class="pedido-link" onclick="window.open('https://va.leroymerlin.com.br/va/checkout/lm/viewCart?cartNumber=00${String(r.pedido).replace(/\D/g, '')}', '_blank')">
+                            ${r.pedido}
+                        </span>
+                    </td>
+                    <td>${formatarMoeda(r.valor)}</td>
+                    <td>
+                        <select class="status-select ${obterClasseStatus(r.status)}">
+                            <option value="Pendente" ${r.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="Instalado" ${r.status === 'Instalado' ? 'selected' : ''}>Instalado</option>
+                            <option value="Feito" ${r.status === 'Feito' ? 'selected' : ''}>Feito</option>
+                            <option value="Não Instalado" ${r.status === 'Não Instalado' ? 'selected' : ''}>Não Instalado</option>
+                            <option value="Eliminado" ${r.status === 'Eliminado' ? 'selected' : ''}>Eliminado</option>
+                            <option value="Cancelado" ${r.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </td>
+                    <td style="text-align: center;">
+                        <button type="button" class="btn-edit">Editar</button>
+                    </td>
+                `;
+
+                const selectStatus = tr.querySelector('.status-select');
+                selectStatus.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    atualizarStatus(r.key, e.target.value);
+                });
+
+                const btnEdit = tr.querySelector('.btn-edit');
+                btnEdit.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editarRegistro(r.key);
+                });
+
+                let timerSegurar = null;
+                const iniciarPressionamento = (e) => { 
+                    if (e.target.closest('.btn-edit') || e.target.closest('.status-select') || e.target.closest('.pedido-link')) return;
+                    tr.classList.add('row-pressing'); 
+                    timerSegurar = setTimeout(() => deletarRegistro(r.key), 900); 
+                };
+                const cancelarPressionamento = () => { 
+                    tr.classList.remove('row-pressing'); 
+                    if (timerSegurar) clearTimeout(timerSegurar); 
+                };
+
+                tr.addEventListener('touchstart', iniciarPressionamento, { passive: true });
+                tr.addEventListener('touchend', cancelarPressionamento);
+                tr.addEventListener('touchmove', cancelarPressionamento);
+                tr.addEventListener('mousedown', iniciarPressionamento);
+                tr.addEventListener('mouseup', cancelarPressionamento);
+                tr.addEventListener('mouseleave', cancelarPressionamento);
+
+                tabelaContainer.appendChild(tr);
+            });
+        }
+
+        document.getElementById('ordemSelect').addEventListener('change', carregarRegistros);
+        document.getElementById('filtroSelect').addEventListener('change', carregarRegistros);
+    </script>
 </body>
 </html>
